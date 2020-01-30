@@ -10,10 +10,10 @@ direc=['D:/Research/EPA_Project/Lake_Erie_HAB/Data/lake_erie_NOAA'];
 format_dir='station_data_format';           % name of the folder which contains station format data
 
 % format files for different station files
-station_files={'erie-clv_bydate',...
-    'erie-clvnorth_bydate',...
-    'erie-cmt_bydate',...
-    'erie-wle_bydate'};
+station_files={'erie-clv_bydate+met',...
+    'erie-clvnorth_bydate+met',...
+    'erie-cmt_bydate+met',...
+    'erie-wle_bydate+met'};
 
 % names of the variables that are needed to be read and arranged
 variables_names={'atemp(DegC)',...
@@ -24,12 +24,14 @@ variables_names={'atemp(DegC)',...
 % what kind of data is to be extracted - met, temp or ysi
 data_tobeextracted='met';
 
-for station_ind=1%:length(station_files)                 % for loop for each station
+for station_ind=4%:length(station_files)                 % 'for' loop for each station
     
     % read station format files
-    folder_file_name=station_files{station_ind};        % name of file (which conatines format info) and folder (whcih contains files)
+    file_contain_format_data=station_files{station_ind};
+    file_contain_format_data_split=strsplit(file_contain_format_data,'+');
+    folder_file_name=file_contain_format_data_split{1};        % name of file (which conatines format info) and folder (whcih contains files)
     filename=fullfile(direc,format_dir,...
-        strcat(folder_file_name,'.txt'));
+        strcat(file_contain_format_data,'.txt'));
     fid=fopen(filename,'r');
     data=textscan(fid,'%s%s%d%s%s','delimiter','\t','headerlines',1);
     fclose(fid);
@@ -58,8 +60,8 @@ for station_ind=1%:length(station_files)                 % for loop for each sta
     fprintf(fid_wtemp,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
         'year','month','day','hour','minute','sec','wtemp(DegC)');
     
-    % write data in text files
-    for year_ind=1:length(year)                   % for loop for each year in a station
+    % write data corresponding the station 'folder_file_name' in four text file
+    for year_ind=1:length(year)                   % 'for' loop for each year in a station
         
         temp_year=year{year_ind};
         temp_folder_name=folder_name{year_ind};
@@ -77,7 +79,7 @@ for station_ind=1%:length(station_files)                 % for loop for each sta
             data_type_folder=fullfile(direc,folder_file_name,temp_year,'met'); % folder containing three data types - met, temp, ysi
             list_textfiles=dir(data_type_folder);
             
-            for textfile_ind=3:size(list_textfiles,1)       % for loop for each textfile in a year
+            for textfile_ind=3:size(list_textfiles,1)       % 'for' loop for each textfile in a year
                 
                 textfile_name=list_textfiles(textfile_ind).name;
                 if ~strcmp(textfile_name,{'.','..'})
@@ -88,6 +90,8 @@ for station_ind=1%:length(station_files)                 % for loop for each sta
                     fclose(fid_textfile);
                     
                     
+                    % read atemp, wspeed, wdir, and wtemp data in separate
+                    % variables
                     data_tobewritten=data(colsequence_toberead_split);
                     data_tobewritten_atemp=cat(2,data_tobewritten{[1:6,7]});
                     data_tobewritten_atemp=cellfun(@str2double,data_tobewritten_atemp);
@@ -107,19 +111,12 @@ for station_ind=1%:length(station_files)                 % for loop for each sta
                     fprintf(fid_wtemp,'%d\t%d\t%d\t%d\t%d\t%d\t%d\n',...
                         data_tobewritten_wtemp');
                     
-%                     if length(cols_toberead_split)==9               % if wtemp is not included in the textfile
-%                         
-%                         
-%                         
-%                     elseif length(cols_toberead_split)==10          % if wtemp is included in the textfile
-%                         
-%                     end
                 end
                 
             end
             
         end
     end
-    flose(fid_atemp); fclose(fid_wspeed); fclose(fid_wdir); fclose(fid_wtemp);
+    fclose(fid_atemp); fclose(fid_wspeed); fclose(fid_wdir); fclose(fid_wtemp);
     
 end
