@@ -1,5 +1,4 @@
-% This routine extracts surface data from NOAA, and computes average of
-% property of profile
+% This routine extracts surface data from NOAA hab samples
 
 clear all
 close all
