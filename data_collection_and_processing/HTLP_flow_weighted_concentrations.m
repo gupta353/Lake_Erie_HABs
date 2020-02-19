@@ -119,7 +119,7 @@ for station_ind=1:length(station_list)          % read data contained in excel f
     sname=strcat('daily_',station_name);
     save_filename=fullfile(direc,sname);
     fid=fopen(save_filename,'w');
-    fprintf(fid,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',var_names{1},var_names{3:end});
+    fprintf(fid,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',var_names{1},'Flow_CMS',var_names{4:end});
     for write_ind=1:size(daily_conc,1)
         fprintf(fid,'%s\t%f\t%f\t%f\t%f\t%f\t%f\n',...
             datestr(unique_datenum_days(write_ind),'mm/dd/yyyy'),...
