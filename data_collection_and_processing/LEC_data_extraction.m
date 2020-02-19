@@ -15,6 +15,7 @@ direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/lake_erie_LEC';
 col_list={'Lookup',...
     'Date/Time'...
     'Station_ID',...
+    'depth(m)',...
     'wtemp(deg C)',...
     'spcond(us/cm)',...
     'do(mg/L)',...
@@ -56,7 +57,7 @@ station_list={'CRIB','4P','7M','8M','GR1',...
 
 % read the WQ data from text-file
 folder='LEC-WLEB_download';
-fname='LEC-WLEB_monitoring_WQ.txt';
+fname='LEC-WLEB_monitoring_PhyAtt.txt';
 filename=fullfile(direc,folder,fname);
 formatspec=strcat('%s%s%s',...
     repmat('%f',1,37));
@@ -66,7 +67,7 @@ fclose(fid);
 
 date_time=data{2};
 station=data{3};
-param=cat(2,data{4:37});
+param=cat(2,data{4:38});
 
 % separate date and time data
 date=cell(length(date_time),1);
@@ -89,12 +90,12 @@ for station_ind=1:length(unique_stations)
     write_param=param(ind,:);
     
     % write data to text-files
-    wfname=strcat('WQ_',unique_stations{station_ind});
+    wfname=strcat('PhyAtt_',unique_stations{station_ind});
     wfilename=fullfile(direc,wfname);
     wformatspec=strcat('%s\t%s\t',...
-        repmat('%f\t',1,33),'%f\n');
+        repmat('%f\t',1,34),'%f\n');
     wfid=fopen(wfilename,'w');
-    fprintf(wfid,strcat(repmat('%s\t',1,35),'%s\n'),'date','time',col_list{4:37});
+    fprintf(wfid,strcat(repmat('%s\t',1,36),'%s\n'),'date','time',col_list{4:38});
     
     for w_ind=1:length(write_date)
         fprintf(wfid,wformatspec,write_date{w_ind},write_time{w_ind},write_param(w_ind,:));
