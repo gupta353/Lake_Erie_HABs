@@ -1,5 +1,5 @@
 % This routine extracts surface data from LEC, and computes average of property
-% of profile
+% of entire profile
 
 clear all
 close all
