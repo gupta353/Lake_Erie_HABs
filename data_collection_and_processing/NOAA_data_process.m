@@ -24,7 +24,7 @@ variables_names={'atemp(DegC)',...
 % what kind of data is to be extracted - met, temp or ysi
 data_tobeextracted='met';
 
-for station_ind=4%:length(station_files)                 % 'for' loop for each station
+for station_ind=3%:length(station_files)                 % 'for' loop for each station
     
     % read station format files
     file_contain_format_data=station_files{station_ind};
@@ -46,19 +46,19 @@ for station_ind=4%:length(station_files)                 % 'for' loop for each s
     write_filename_atemp=fullfile(direc,folder_file_name,'atemp.txt');
     write_filename_wspeed=fullfile(direc,folder_file_name,'wspped_avg.txt');
     write_filename_wdir=fullfile(direc,folder_file_name,'wdir_avg.txt');
-    write_filename_wtemp=fullfile(direc,folder_file_name,'wtemp.txt');
+%     write_filename_wtemp=fullfile(direc,folder_file_name,'wtemp.txt');
     fid_atemp=fopen(write_filename_atemp,'w');
     fid_wspeed=fopen(write_filename_wspeed,'w');
     fid_wdir=fopen(write_filename_wdir,'w');
-    fid_wtemp=fopen(write_filename_wtemp,'w');
+%     fid_wtemp=fopen(write_filename_wtemp,'w');
     fprintf(fid_atemp,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
         'year','month','day','hour','minute','sec','atemp(DegC)');
     fprintf(fid_wspeed,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
         'year','month','day','hour','minute','sec','wspeed_avg(m/s)');
     fprintf(fid_wdir,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
         'year','month','day','hour','minute','sec','wdir_avg(Deg)');
-    fprintf(fid_wtemp,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
-        'year','month','day','hour','minute','sec','wtemp(DegC)');
+%     fprintf(fid_wtemp,'%s\t%s\t%s\t%s\t%s\t%s\t%s\n',...
+%         'year','month','day','hour','minute','sec','wtemp(DegC)');
     
     % write data corresponding the station 'folder_file_name' in four text file
     for year_ind=1:length(year)                   % 'for' loop for each year in a station
@@ -93,14 +93,14 @@ for station_ind=4%:length(station_files)                 % 'for' loop for each s
                     % read atemp, wspeed, wdir, and wtemp data in separate
                     % variables
                     data_tobewritten=data(colsequence_toberead_split);
-                    data_tobewritten_atemp=cat(2,data_tobewritten{[1:6,7]});
+                    data_tobewritten_atemp=cat(2,data_tobewritten{[1:3,4]});
                     data_tobewritten_atemp=cellfun(@str2double,data_tobewritten_atemp);
-                    data_tobewritten_wspeed=cat(2,data_tobewritten{[1:6,8]});
+                    data_tobewritten_wspeed=cat(2,data_tobewritten{[1:3,5]});
                     data_tobewritten_wspeed=cellfun(@str2double,data_tobewritten_wspeed);
-                    data_tobewritten_wdir=cat(2,data_tobewritten{[1:6,9]});
+                    data_tobewritten_wdir=cat(2,data_tobewritten{[1:3,6]});
                     data_tobewritten_wdir=cellfun(@str2double,data_tobewritten_wdir);
-                    data_tobewritten_wtemp=cat(2,data_tobewritten{[1:6,10]});
-                    data_tobewritten_wtemp=cellfun(@str2double,data_tobewritten_wtemp);
+%                     data_tobewritten_wtemp=cat(2,data_tobewritten{[1:6,10]});
+%                     data_tobewritten_wtemp=cellfun(@str2double,data_tobewritten_wtemp);
                     
                     fprintf(fid_atemp,'%d\t%d\t%d\t%d\t%d\t%d\t%d\n',...
                         data_tobewritten_atemp');
@@ -108,8 +108,8 @@ for station_ind=4%:length(station_files)                 % 'for' loop for each s
                         data_tobewritten_wspeed');
                     fprintf(fid_wdir,'%d\t%d\t%d\t%d\t%d\t%d\t%d\n',...
                         data_tobewritten_wdir');
-                    fprintf(fid_wtemp,'%d\t%d\t%d\t%d\t%d\t%d\t%d\n',...
-                        data_tobewritten_wtemp');
+%                     fprintf(fid_wtemp,'%d\t%d\t%d\t%d\t%d\t%d\t%d\n',...
+%                         data_tobewritten_wtemp');
                     
                 end
                 
@@ -117,6 +117,6 @@ for station_ind=4%:length(station_files)                 % 'for' loop for each s
             
         end
     end
-    fclose(fid_atemp); fclose(fid_wspeed); fclose(fid_wdir); fclose(fid_wtemp);
+    fclose(fid_atemp); fclose(fid_wspeed); fclose(fid_wdir); % fclose(fid_wtemp);
     
 end
