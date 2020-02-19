@@ -40,18 +40,25 @@ for station_ind=1:length(station_list)          % read data contained in excel f
         time_window=T.(var_names{2});
         ind_tw=find(time_window<=1);                                % the samples with time-window greater than 1
         ind_tw=setdiff(ind_tw,rows_tobe_removed);
-        time_window=time_window(ind_tw);
         
         % datenums
         datetime=T.(var_names{1});
-        datetime=datetime(ind_tw);
-        datenums=cellfun(datenum_wrapper,datetime);
-        datenum_days=floor(datenums);
-        unique_datenum_days=unique(datenum_days);
         
         % streamflow and other properties
         strm=T.(var_names{3});
-        strm=cellfun(@str2double,strm)*0.028316847;  strm=strm(ind_tw);   % streamflow in cms
+        strm=cellfun(@str2double,strm);
+        % find indices that correspond to negative streamflow
+        ind_strm=find(strm>0);
+        ind_tw=intersect(ind_tw,ind_strm);
+        strm=strm(ind_tw)*0.028316847;   % streamflow in cms
+        % selec sane datenums
+         datetime=datetime(ind_tw);
+        datenums=cellfun(datenum_wrapper,datetime);
+        datenum_days=floor(datenums);
+        % select sane time-window data
+        time_window=time_window(ind_tw);
+        unique_datenum_days=unique(datenum_days);
+        % read property data
         SS=T.(var_names{4});        SS=SS(ind_tw);
         TP=T.(var_names{5});        TP=TP(ind_tw);
         SRP=T.(var_names{6});       SRP=SRP(ind_tw);
