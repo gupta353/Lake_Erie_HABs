@@ -5,30 +5,41 @@ clear all
 close all
 clc
 
-% which station of maumee bay
-bay_station='4P';
+
+direc_htlp='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP'; 
+bay_station='4P';           % which station of maumee bay
 save_direc='D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/observed_vs_predicted_plots_03_23_2019';
 datenum_wrapper=@(x)datenum(x,'mm/dd/yyyy');
-
-% read maumee river data
-direc_htlp='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP';
+frac_cal_samples=0.70;      % fraction of samples tobe used for calibration
+outlier_lim=0.3;            % sample with concentration greater than this value (in bay) are considered outliers
+%% read observed maumee river data
+%{
 fname_htlp='daily_maumeedata.txt';
 filename=fullfile(direc_htlp,fname_htlp);
 data=readtable(filename,'delimiter','\t');
 date_river=data.(1);
 datenum_river=cellfun(datenum_wrapper,date_river);
 streamflow=data.Flow_CMS;
-TP_river=data.TP_Mg_LAsP;
-TP_river(TP_river<0)=NaN;
-TP_load_river_raw=TP_river.*streamflow*(10^(-3)*24*3600);
+TP_conc_river=data.TP_Mg_LAsP;
+TP_conc_river(TP_conc_river<0)=NaN;
+TP_load_river_raw=TP_conc_river.*streamflow*(10^(-3)*24*3600);
 
 % replace the data corresponding to missing dates with nan
 max_num_datenum=[datenum_river(1):datenum_river(end)]';
 TP_load_river=nan(length(max_num_datenum),1);
 [~,ia,~]=intersect(max_num_datenum,datenum_river);
 TP_load_river(ia)=TP_load_river_raw;
+%}
 
-% read maumee bay data
+%% read reconstructed maumee river data
+fname='maumee_reconstructed_TP_conc.txt';
+filename=fullfile(direc_htlp,fname);
+data=readtable(filename,'delimiter','\t');
+date_river=data.(1);
+datenum_river=cellfun(datenum_wrapper,date_river);
+TP_load_river=data.(4);
+
+%% read maumee bay data
 fname_lec=strcat('WQ_',bay_station);
 direc_lec='D:/Research/EPA_Project/Lake_Erie_HAB/Data/lake_erie_LEC';
 filename=fullfile(direc_lec,fname_lec);
@@ -42,10 +53,11 @@ empty_datenum=[];
 count=0;
 for date_ind=1:length(date_bay)
     
+    % find datenum corresponding to bay data in river data
     datenum_tmp=datenum_bay(date_ind);
     ind=find(datenum_river==datenum_tmp);
     
-    if isempty(ind)
+    if isempty(ind)     % if no detenum couldbe found in river data
         empty_datenum=[empty_datenum;datenum_tmp];
     else
         count=count+1;
@@ -66,8 +78,8 @@ TP_conc_bay=TP_conc_bay(not_nan_ind);                          % response variab
 TP_load_river_pred=TP_load_river_pred(not_nan_ind,:);          % predictor variable (each row is a predictor variable)
 
 % remove outliers
-TP_load_river_pred(TP_conc_bay>0.3,:)=[];
-TP_conc_bay(TP_conc_bay>0.3)=[];
+TP_load_river_pred(TP_conc_bay>outlier_lim,:)=[];
+TP_conc_bay(TP_conc_bay>outlier_lim)=[];
 
 
 % create aggregated predictors
@@ -89,7 +101,7 @@ TP_conc_bay(TP_conc_bay>0.3)=[];
 %     sum(TP_load_river_pred(:,1:45),2)];
 
 nsamp=length(TP_conc_bay);
-cal_ind=1:round(0.80*nsamp);      % 70* samples in calibration
+cal_ind=1:round(frac_cal_samples*nsamp);      % index of samples in calibration set
 val_ind=setdiff(1:nsamp,cal_ind); % rest in validation
 ncal=length(cal_ind);             % number of calibration samples
 nval=length(val_ind);             % number of validation samples
@@ -117,11 +129,13 @@ Fitted_val=[ones(nval,1),pred_val]*beta;
 %}
 
 %% random forest
+%
 NumTrees=100;
 B = TreeBagger(NumTrees,pred_cal,resp_cal,...
     'Method','regression','NVarToSample',30,'MinLeaf',3); 
 Fitted_cal=predict(B,pred_cal);
 Fitted_val=predict(B,pred_val);
+%}
 %% plot
 R2_cal=corr(Fitted_cal,resp_cal)^2;
 R2_val=corr(Fitted_val,resp_val)^2;
@@ -146,7 +160,7 @@ box('on');
 box.linewidth=2;
 set(gca,'fontname','arial','fontsize',10,box);
 clear box
-break
+
 sname=strcat('obs_vs_pred_',bay_station,'.svg');
 save_filename=fullfile(save_direc,sname);
 fig2svg(save_filename);
