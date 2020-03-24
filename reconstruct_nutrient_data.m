@@ -1,4 +1,6 @@
 % Reconstruction of maumee river nutient load data using RVM
+% Note: (1) LOADEST model# 3 is chosen for reconstruction
+%
 
 clear all
 close all
@@ -7,6 +9,7 @@ clc
 direc_htlp='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP';
 datenum_wrapper=@(x)datenum(x,'mm/dd/yyyy');
 strsplit_wrapper=@(x)strsplit(x,'/');
+calib_samples=30;                       % number of samples used for calibration
 
 % read wq concentration data
 fname_htlp='daily_maumeedata.txt';
@@ -26,6 +29,8 @@ datenum_strm=cellfun(datenum_wrapper,date_strm);
 strm=data.(2);              % streamflow in cfs
 
 % find common datenums in wq and strm data
+% date_wq_backup=date_wq;
+% wq_conc_backup=wq_conc;
 [~,i_wq,i_strm]=intersect(datenum_wq,datenum_strm);
 wq_conc=wq_conc(i_wq);
 datenum_wq=datenum_wq(i_wq);
@@ -63,7 +68,7 @@ for i=1:length(nan_inds)
     % find the nearest 30 samples that are not nans
     diff=[abs(not_nan_inds-nan_ind_tmp),not_nan_inds];
     sorted_diff=sortrows(diff);
-    nearest_thirty=sort(sorted_diff(1:30,2));
+    nearest_thirty=sort(sorted_diff(1:calib_samples,2));
     
     % read streamflow and wq data corresponding to these nearest 30 samples
     constituent.calib.C=wq_conc_tmp(nearest_thirty);
@@ -81,15 +86,15 @@ for i=1:length(nan_inds)
     wq_conc_tmp(nan_ind_tmp)=conc;
     
 end
-wq_load=wq_conc_tmp.*strm*(10^(-3)/35.3);
+wq_load=wq_conc_tmp.*strm*(10^(-3)/35.3*24*3600);   % WQ load in Kg/day
 % save reconstructed wq concentration data
 sname='maumee_reconstructed_TP_conc.txt';
 save_filename=fullfile(direc_htlp,sname);
 fid=fopen(save_filename,'w');
-fprintf(fid,'%s\t%s\t%s\n','Date','TP(mg/L)','TP_load(Kg/day)');
+fprintf(fid,'%s\t%s\t%s\t%s\n','Date','TP(mg/L)','streamflow(cfs)','TP_load(Kg/day)');
 for write_ind=1:length(date)
     
-    fprintf(fid,'%s\t%d\t%d\n',date{write_ind},wq_conc_tmp(write_ind),wq_load(write_ind));
+    fprintf(fid,'%s\t%d\t%d\t%d\n',date{write_ind},wq_conc_tmp(write_ind),strm(write_ind),wq_load(write_ind));
     
 end
 fclose(fid);
