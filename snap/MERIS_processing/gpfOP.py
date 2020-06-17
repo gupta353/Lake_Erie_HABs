@@ -64,7 +64,7 @@ def plot_image(product,bandname):
     plt.show()
 
 # subset operator
-def subsetAG(product,wkt)
+def subsetAG(product,wkt):
 
     SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
     WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
