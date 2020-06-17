@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import geopandas as gpd
 import os
+import gpfOP
 
 from snappy import ProductIO
 from snappy import jpy
@@ -43,12 +44,7 @@ def CI_compute(direc, fname):
 
     # create a subset of the product according to Lake Erie mask
     wkt = "POLYGON((-83.56861 41.5027, -82.08055 41.25472, -81.81277 41.9925, -83.32 42.27277, -83.56861 41.5027))"
-    geometry = WKTReader().read(wkt)
-
-    op = SubsetOp()
-    op.setSourceProduct(product)
-    op.setGeoRegion(geometry)
-    product = op.getTargetProduct()
+    product=gpfOP.subsetAG(product,wkt)
 
     # if product is empty after subset: break
     if not list(product.getBandNames()):
@@ -80,12 +76,7 @@ def CI_compute(direc, fname):
     long_top_right=long_data[0,Width-1]
 
     wkt_new="POLYGON(("+str(long_bottom_left)+' '+str(lat_bottom_left)+', '+str(long_bottom_right)+' '+str(lat_bottom_right)+', '+str(long_top_right)+' '+str(lat_top_right)+', '+str(long_top_left)+' '+str(lat_top_left)+', '+str(long_bottom_left)+' '+str(lat_bottom_left)+"))"
-    geometry_new = WKTReader().read(wkt_new)
-
-    op1 = SubsetOp()
-    op1.setSourceProduct(mask_product)
-    op1.setGeoRegion(geometry_new)
-    mask_product = op1.getTargetProduct()
+    mask_product=gpfOP.subsetAG(mask_product,wkt_new)
     
     # Resample masked product
     param=HashMap()
@@ -95,97 +86,44 @@ def CI_compute(direc, fname):
     mask_product = GPF.createProduct('Resample', param, mask_product)
 
     # Merge product and mask product
-    sourceProducts= HashMap()
-    sourceProducts.put('masterProduct', product)
-    sourceProducts.put('slaveProduct', mask_product)
-    parameters = HashMap()
-    parameters.put('geographicError','NaN')
-    product = GPF.createProduct('Merge', parameters, sourceProducts)
-
+    product=gpfOP.MergeAG(product,mask_product,'NaN')
+    
     # create a band out of water mask of product
-    BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')
-
-    targetBand = BandDescriptor()
-    targetBand.name = 'water_mask'
-    targetBand.type = 'float32'
-    targetBand.expression = 'water? 1 : 0'
-    targetBand.noDataValue=float("nan")
-
-    targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
-    targetBands[0] = targetBand
-
-    params = HashMap()
-    params.put('targetBands', targetBands)
-    water_mask_prod = GPF.createProduct('BandMaths', params, product)
-
+    newBandName = 'water_mask'
+    datatype = 'float32'
+    expression = 'water? 1 : 0'
+    noDataVal='nan'
+    water_mask_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
+    
     # merge the product 'water_mask_prod' with product
-    sourceProducts= HashMap()
-    sourceProducts.put('masterProduct', product)
-    sourceProducts.put('slaveProduct', water_mask_prod)
-    parameters = HashMap()
-    parameters.put('geographicError','NaN')
-    product = GPF.createProduct('Merge', parameters, sourceProducts)
+    product=gpfOP.MergeAG(product,water_mask_prod,'NaN')
 
     # Use Bandmaths to create intersection of water mask and lake Erie mask
-    targetBand = BandDescriptor()
-    targetBand.name = 'water_LE_mask'
-    targetBand.type = 'float32'
-    targetBand.expression = 'water_mask*LE_Mask'
-    targetBand.noDataValue=float("nan")
-
-    targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
-    targetBands[0] = targetBand
-
-    params = HashMap()
-    params.put('targetBands', targetBands)
-    water_LE_prod = GPF.createProduct('BandMaths', params, product)
+    newBandName = 'water_LE_mask'
+    datatype = 'float32'
+    expression = 'water_mask*LE_Mask'
+    noDataVal='nan'
+    water_LE_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
     # merge water_LE_prod_with product
-    sourceProducts= HashMap()
-    sourceProducts.put('masterProduct', product)
-    sourceProducts.put('slaveProduct', water_LE_prod)
-    parameters = HashMap()
-    parameters.put('geographicError','NaN')
-    product = GPF.createProduct('Merge', parameters, sourceProducts)
+    product=gpfOP.MergeAG(product,water_LE_prod,'NaN')
 
     # Use BandMaths operator to compute CI
-    BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')
-
-    targetBand = BandDescriptor()
-    targetBand.name = 'CI'
-    targetBand.type = 'float32'
-    targetBand.expression = 'LE_Mask == 1 and water? (reflec_7-reflec_8) + (reflec_9 - reflec_7)*(680-664)/(708-664): NaN'
-    targetBand.noDataValue=float("nan")
-
-    targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
-    targetBands[0] = targetBand
-
-    params = HashMap()
-    params.put('targetBands', targetBands)
-    CI_prod = GPF.createProduct('BandMaths', params, product)
+    newBandName = 'CI'
+    datatype = 'float32'
+    expression = 'LE_Mask == 1 and water? (reflec_7-reflec_8) + (reflec_9 - reflec_7)*(680-664)/(708-664): NaN'
+    noDataVal='nan'
+    CI_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
     # assign 0 to all the values of CI that are less than zero
-    targetBand = BandDescriptor()
-    targetBand.name = 'CI'
-    targetBand.type = 'float32'
-    targetBand.expression = 'CI<0 ? 0: CI'
-    targetBand.noDataValue=float("nan")
-
-    targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
-    targetBands[0] = targetBand
-
-    params = HashMap()
-    params.put('targetBands', targetBands)
-    CI_prod = GPF.createProduct('BandMaths', params, CI_prod)
+    newBandName = 'CI'
+    datatype = 'float32'
+    expression = 'CI<0 ? 0: CI'
+    noDataVal='nan'
+    CI_prod=gpfOP.BandMathsAG(CI_prod,newBandName,datatype,expression,noDataVal)
 
     # merge CI_prod_with product
-    sourceProducts= HashMap()
-    sourceProducts.put('masterProduct', product)
-    sourceProducts.put('slaveProduct', CI_prod)
-    parameters = HashMap()
-    parameters.put('geographicError','NaN')
-    product = GPF.createProduct('Merge', parameters, sourceProducts)
-
+    product=gpfOP.MergeAG(product,CI_prod,'NaN')
 
     # write product to a new file
     wfname=os.path.splitext(fname)[0]
