@@ -40,3 +40,5 @@ def computeCompositeCI(compositeProduct):
         # Merge
         compProduct=gpfOP.MergeAG(compProduct,CI_prod,geographicError)
 
+    return compProduct
+
