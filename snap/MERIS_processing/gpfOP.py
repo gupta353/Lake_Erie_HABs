@@ -19,11 +19,10 @@ from snappy import jpy
 from snappy import HashMap
 from snappy import GPF
 
-
-BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')
 # BandMath operator
 def BandMathsAG(product,newBandName,datatype,expression):
-    
+
+    BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')    
     targetBand = BandDescriptor()
     targetBand.name = newBandName
     targetBand.type = datatype
@@ -48,6 +47,7 @@ def MergeAG(masterProduct,slaveProduct,geographicError):
     product = GPF.createProduct('Merge', parameters, sourceProducts)
     return product
 
+# plot image
 def plot_image(product,bandname):
 
     band=product.getBand(bandname)
@@ -62,3 +62,17 @@ def plot_image(product,bandname):
     fig.axes.get_xaxis().set_visible(False)
     fig.axes.get_yaxis().set_visible(False)
     plt.show()
+
+# subset operator
+def subsetAG(product,wkt)
+
+    SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
+    WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
+
+    geometry = WKTReader().read(wkt)
+
+    op = SubsetOp()
+    op.setSourceProduct(product)
+    op.setGeoRegion(geometry)
+    subproduct = op.getTargetProduct()
+    return subproduct
