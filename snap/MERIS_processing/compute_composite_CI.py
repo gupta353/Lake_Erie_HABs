@@ -33,7 +33,10 @@ def computeCompositeCI(compositeProduct):
 
     for comp_ind in range(0,len(CI_bandnames)):
         # Apply BandMath
-        newBandName = 'composite_CI_'+str(comp_ind+1)
+        if comp_ind == len(CI_bandnames)-1:
+            newBandName = 'composite_CI_final'
+        else:
+            newBandName = 'composite_CI_'+str(comp_ind+1)
         datatype = 'float32'
         expression = 'if (not nan(composite_CI_'+str(comp_ind)+') and not nan('+CI_bandnames[comp_ind]+')) then max(composite_CI_'+str(comp_ind)+','+CI_bandnames[comp_ind]+')'+' else (if not nan(composite_CI_'+str(comp_ind)+') then composite_CI_'+str(comp_ind)+' else '+CI_bandnames[comp_ind]+')'
         CI_prod=gpfOP.BandMathsAG(compProduct,newBandName,datatype,expression,noDataVal)
