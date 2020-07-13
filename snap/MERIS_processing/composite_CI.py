@@ -16,12 +16,14 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import datetime
 import math
+import compute_composite_CI
 
 from snappy import ProductIO
 from snappy import jpy
 from snappy import HashMap
 from snappy import GPF
 from datetime import date
+from compute_composite_CI import computeCompositeCI
 
 SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
@@ -68,7 +70,7 @@ for fname in fname_list:
         product_date.append([fname,z])
         product_engdate.append(x.split('2PPBCM')[1])
         
-# resample and merge products in each time-window
+# resample, merge products and compute composite image in each time-window
 for tw_ind in range(0,num_time_windows):
     ind=[i for i, datenum_value in enumerate(product_datenum) if(datenum_value>=time_window[tw_ind][0] and datenum_value<=time_window[tw_ind][1])] # find the indices of the product that are contained in this time-window
 
@@ -111,6 +113,8 @@ for tw_ind in range(0,num_time_windows):
             parameters.put('includes',include_bands)
             composite_prod = GPF.createProduct('Merge', parameters, sourceProducts)
 
+        # compute composite image
+        compositeProduct=computeCompositeCI(composite_prod)
             
         # write the composite product
         bdate_obj=datetime.date.fromordinal(time_window[tw_ind][0])
@@ -120,4 +124,4 @@ for tw_ind in range(0,num_time_windows):
 
         wfname='MER_FRS_2PPBCM_'+bdate+'_'+edate+'.dim'
         wfilename=direc+'/composite_product/'+wfname
-        ProductIO.writeProduct(composite_prod,wfilename,'BEAM-DIMAP')
+        ProductIO.writeProduct(compositeProduct,wfilename,'BEAM-DIMAP')
