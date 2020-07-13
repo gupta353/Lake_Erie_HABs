@@ -3,7 +3,7 @@
 Created on Tue Jun 09 20:40:00 2020
 
 Main script to call cloud_cover_perc in for loop
-Cloud cover is computed in both over entire lake Erie mask and northern part of the lake
+Cloud cover is computed both over entire lake Erie mask and Eastern part of the lake
 
 @author: Abhinav
 """
@@ -21,7 +21,7 @@ SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2009_001_2020-05-20T23-31-17'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/MERIS_2009_full_extent_product/CI_product'
 
 # compute cloud cover in for loop
 fname_list=os.listdir(direc)
