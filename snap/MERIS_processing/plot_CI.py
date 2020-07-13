@@ -2,6 +2,8 @@
 """
 Created on Wed Apr 22 20:37:51 2020
 
+plot of a product band
+
 @author: Abhinav
 """
 
