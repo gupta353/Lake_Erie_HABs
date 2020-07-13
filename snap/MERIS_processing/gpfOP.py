@@ -1,7 +1,7 @@
 """
 Created on Wed Jun 17 13:00:00 2020
 
-GPF operatorsd are implemented in this module
+GPF operators are implemented in this module
 
 @author: Abhinav Gupta
 """
@@ -20,14 +20,15 @@ from snappy import HashMap
 from snappy import GPF
 
 # BandMath operator
-def BandMathsAG(product,newBandName,datatype,expression):
+def BandMathsAG(product,newBandName,datatype,expression,noDataVal):
 
     BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')    
     targetBand = BandDescriptor()
     targetBand.name = newBandName
     targetBand.type = datatype
     targetBand.expression = expression
-
+    targetBand.noDataValue=float(noDataVal)
+    
     targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
     targetBands[0] = targetBand
 
