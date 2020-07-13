@@ -15,10 +15,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+
 from snappy import ProductIO
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
 
 # read product
 # list all the products with extension N1
@@ -27,7 +28,7 @@ for fname in fname_list:
     if fname.endswith(".dim"):
         file_path=direc+'/'+fname
         product=ProductIO.readProduct(file_path)
-        CI=product.getBand('CI')
+        CI=product.getBand('composite_CI_final')
         Width=CI.getRasterWidth()
         Height=CI.getRasterHeight()
         CI_data = np.zeros(Width*Height, dtype=np.float32)
