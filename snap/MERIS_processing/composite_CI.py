@@ -17,6 +17,7 @@ import matplotlib.cm as cm
 import datetime
 import math
 import compute_composite_CI
+import re
 
 from snappy import ProductIO
 from snappy import jpy
@@ -30,8 +31,7 @@ WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 NodeDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2002_001_2020-05-21T14-50-31'
-
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46'
 # target widht and target heights of resamplig
 targetWidth=500
 targetHeight=300
@@ -40,8 +40,8 @@ targetHeight=300
 time_window_per=10
 
 # being and end dates
-begin_date='2002-05-01'
-end_date='2002-10-31'
+begin_date='2011-05-01'
+end_date='2011-10-31'
 
 # list the min-max dates of each time-window including begin_date
 begin_date_obj=datetime.datetime.strptime(begin_date,'%Y-%m-%d')
