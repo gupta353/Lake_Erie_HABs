@@ -2,7 +2,7 @@
 """
 Created on Tue Jun 10 21:03:00 2020
 
-Eastern part of lake
+This routine subsetts Eastern part of lake based on WKT provided below
 
 @author: Abhinav
 """
