@@ -34,7 +34,6 @@ def CI_compute(direc, fname):
     #direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/MERIS'
 
     # read product
-    #fname='MER_FRS_2PPBCM20110801_160652_000000313105_00112_49264_0001'
     file_path=direc+'/'+fname
     product=ProductIO.readProduct(file_path)
 
