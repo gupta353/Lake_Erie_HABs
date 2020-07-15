@@ -16,11 +16,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import copy
+import datetime
 
 from snappy import ProductIO
+from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2002_001_2020-05-21T14-50-31/composite_product'
 
 # read product
 # list all the products with extension N1
@@ -49,14 +51,25 @@ for fname in fname_list:
         # compute the sum of CI over all pixels
         product_app.append(fname)
         CI_sum.append(np.nansum(CI_data))
-        
-# write data to a text-file
+
+# create an list of data to be written
 num = len(CI_sum)
+data = []
+for ind in range(0,num):
+    split_txt = product_app[ind].split('_')
+    begin_date = split_txt[3]
+    dt = datetime.datetime.strptime(begin_date,'%Y%m%d')
+    datenum = date.toordinal(dt)
+    data.append([product_app[ind],CI_sum[ind],num_pixels[ind],datenum])
+    data.sort(key = lambda i: i[3])
+    
+# write data to a text-file
+
 filename=direc+'/'+'total_CI.txt'
 fid=open(filename,'w')
 fid.write('Product_name'+'\tTotal_CI'+'\tNumber_of_pixels_positive_CI\n')
 for ind in range(0,num):
-    fid.write(product_app[ind]+'\t'+str(CI_sum[ind])+'\t'+str(num_pixels[ind])+'\n')
+    fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\n')
 fid.close()
         
 
