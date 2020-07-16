@@ -36,6 +36,12 @@ direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_M
 targetWidth=500
 targetHeight=300
 
+# read the list of products to be filtered out
+filename = direc+'/list_of_products_to_be_filtered_out.txt'
+fid = open(filename,'r')
+filter_prods = fid.read().splitlines()
+fid.close()
+
 # time-window period to create a composite image
 time_window_per=10
 
@@ -56,8 +62,12 @@ for ind in range(0,num_time_windows):
     time_window.append([begin_datenum+ind*time_window_per,begin_datenum+(ind+1)*time_window_per-1])
     
 
-# list the dates of each product
+# list the products and remove the products listed in filter_prods
 fname_list=os.listdir(direc)
+for prod in filter_prods:
+    fname_list.remove(prod)    
+
+# list the dates of each product
 product_date=[]
 product_datenum=[]
 product_engdate=[]
@@ -101,7 +111,7 @@ for tw_ind in range(0,num_time_windows):
             include_2.setName('CI')
             lst_bnd[count]='CI_'+str(product_engdate[prod_ind])
             include_2.setNewName(lst_bnd[count])
-            
+                
             include_bands = jpy.array('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor',1)
             include_bands[0]=include_2
 
