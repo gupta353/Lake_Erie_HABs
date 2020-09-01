@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2002_001_2020-05-21T14-50-31/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
 
 # read product
 # list all the products with extension N1
@@ -60,16 +60,18 @@ for ind in range(0,num):
     begin_date = split_txt[3]
     dt = datetime.datetime.strptime(begin_date,'%Y%m%d')
     datenum = date.toordinal(dt)
-    data.append([product_app[ind],CI_sum[ind],num_pixels[ind],datenum])
+    date_prop = date.fromordinal(datenum)
+    date_str = str(date_prop.year)+'-'+str('%02d' %date_prop.month)+'-'+str('%02d' %date_prop.day)
+    data.append([product_app[ind],CI_sum[ind],num_pixels[ind],date_str])
     data.sort(key = lambda i: i[3])
     
 # write data to a text-file
 
 filename=direc+'/'+'total_CI.txt'
 fid=open(filename,'w')
-fid.write('Product_name'+'\tTotal_CI'+'\tNumber_of_pixels_positive_CI\n')
+fid.write('Product_name'+'\tTotal_CI'+'\tNumber_of_pixels_positive_CI'+'\tbegin_date\n')
 for ind in range(0,num):
-    fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\n')
+    fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\n')
 fid.close()
         
 
