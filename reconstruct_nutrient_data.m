@@ -17,7 +17,7 @@ filename=fullfile(direc_htlp,fname_htlp);
 data=readtable(filename,'delimiter','\t');
 date_wq=data.(1);
 datenum_wq=cellfun(datenum_wrapper,date_wq);
-wq_conc=data.TP_Mg_LAsP;
+wq_conc=data.SRP_Mg_L_AsP;
 wq_conc(wq_conc<0)=NaN;
 
 % read streamflow data
@@ -37,7 +37,7 @@ datenum_wq=datenum_wq(i_wq);
 date_wq=date_wq(i_wq);
 
 % fill the missing dates with NaNs in wq data and pick up streamflow data
-% corresponding towq data
+% corresponding to wq data
 datenum_range=datenum_wq(1):datenum_wq(end);
 [~,iwq,~]=intersect(datenum_range,datenum_wq);
 wq_conc_tmp=nan(length(datenum_range),1);
@@ -88,10 +88,10 @@ for i=1:length(nan_inds)
 end
 wq_load=wq_conc_tmp.*strm*(10^(-3)/35.3*24*3600);   % WQ load in Kg/day
 % save reconstructed wq concentration data
-sname='maumee_reconstructed_TP_conc.txt';
+sname='maumee_reconstructed_SRP_conc.txt';
 save_filename=fullfile(direc_htlp,sname);
 fid=fopen(save_filename,'w');
-fprintf(fid,'%s\t%s\t%s\t%s\n','Date','TP(mg/L)','streamflow(cfs)','TP_load(Kg/day)');
+fprintf(fid,'%s\t%s\t%s\t%s\n','Date','SRP(mg/L)','streamflow(cfs)','SRP_load(Kg/day)');
 for write_ind=1:length(date)
     
     fprintf(fid,'%s\t%d\t%d\t%d\n',date{write_ind},wq_conc_tmp(write_ind),strm(write_ind),wq_load(write_ind));
