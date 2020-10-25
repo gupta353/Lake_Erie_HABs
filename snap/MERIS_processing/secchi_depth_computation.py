@@ -49,9 +49,9 @@ def sd_compute(direc, fname):
         return
 
     # Use BandMaths operator to compute secchi depth
-    newBandName = 'secchi_depth'
+    newBandName = 'secchi_depth_over_pos_CI'
     datatype = 'float32'
-    expression = '(LE_Mask == 1 and water) and (reflec_6>0 and reflec_4>0)? exp10(-1.04*(reflec_6/reflec_4) + 0.99): NaN'
+    expression = '((LE_Mask == 1 and water) and (reflec_6>0 and reflec_4>0) and CI>0)? exp10(-1.04*(reflec_6/reflec_4) + 0.99): NaN'
     noDataVal='nan'
     sd_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
