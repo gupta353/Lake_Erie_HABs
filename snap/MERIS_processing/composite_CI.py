@@ -46,8 +46,8 @@ fid.close()
 time_window_per=10
 
 # being and end dates
-begin_date='2002-05-01'
-end_date='2002-10-31'
+begin_date='2011-05-01'
+end_date='2011-10-30'
 
 # list the min-max dates of each time-window including begin_date
 begin_date_obj=datetime.datetime.strptime(begin_date,'%Y-%m-%d')
