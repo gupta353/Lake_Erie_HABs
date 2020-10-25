@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2006_001_2020-05-19T22-11-38/composite_sd_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_sd_product_1'
 
 # read product
 # list all the products with extension dim
@@ -34,7 +34,7 @@ for fname in fname_list:
     if fname.endswith(".dim"):
         file_path=direc+'/'+fname
         product=ProductIO.readProduct(file_path)
-        SD=product.getBand('composite_secchi_depth_final')
+        SD=product.getBand('composite_secchi_depth_over_pos_CI_final')
         Width=SD.getRasterWidth()
         Height=SD.getRasterHeight()
         SD_data = np.zeros(Width*Height, dtype=np.float32)
@@ -66,9 +66,9 @@ for ind in range(0,num):
     data.sort(key = lambda i: i[3])
     
 # write data to a text-file
-filename=direc+'/'+'total_secchi_depth.txt'
+filename=direc+'/'+'total_secchi_depth_over_pos_CI.txt'
 fid=open(filename,'w')
-fid.write('Product_name'+'\tTotal_secchi_depth(m)'+'\tNumber_of_pixels_positive_SD'+'\tbegin_date\n'+'\taverage_secchi_depth(m)')
+fid.write('Product_name'+'\tTotal_secchi_depth(m)'+'\tNumber_of_pixels_positive_SD'+'\tbegin_date'+'\taverage_secchi_depth(m)\n')
 for ind in range(0,num):
     fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\t'+str(data[ind][4])+'\n')
 fid.close()
