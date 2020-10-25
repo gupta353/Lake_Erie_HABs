@@ -83,12 +83,12 @@ for fname in fname_list:
 # resample, merge products and compute composite image in each time-window
 for tw_ind in range(0,num_time_windows):
     ind=[i for i, datenum_value in enumerate(product_datenum) if(datenum_value>=time_window[tw_ind][0] and datenum_value<=time_window[tw_ind][1])] # find the indices of the product that are contained in this time-window
-
+    
     if len(ind) != 0:
         fname=product_date[ind[0]][0]
         filename=direc+'/'+fname
         composite_prod=ProductIO.readProduct(filename)
-
+        
         lst_bnd=ind;
         count=-1
         for prod_ind in ind:
@@ -108,8 +108,8 @@ for tw_ind in range(0,num_time_windows):
             # Merge products
             include_2 = NodeDescriptor()
             include_2.setProductId('slaveProduct')
-            include_2.setName('secchi_depth')
-            lst_bnd[count]='secchi_depth_'+str(product_engdate[prod_ind])
+            include_2.setName('secchi_depth_over_pos_CI')
+            lst_bnd[count]='secchi_depth_over_pos_CI_'+str(product_engdate[prod_ind])
             include_2.setNewName(lst_bnd[count])
                 
             include_bands = jpy.array('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor',1)
@@ -133,5 +133,5 @@ for tw_ind in range(0,num_time_windows):
         edate=str(edate_obj.year)+str(edate_obj.month)+str(edate_obj.day)
 
         wfname='MER_FRS_2PPBCM_'+bdate+'_'+edate+'.dim'
-        wfilename=direc+'/composite_sd_product/'+wfname
+        wfilename=direc+'/composite_sd_product_1/'+wfname
         ProductIO.writeProduct(compositeProduct,wfilename,'BEAM-DIMAP')
