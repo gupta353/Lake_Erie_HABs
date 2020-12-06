@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import geopandas as gpd
+import os
 
 from snappy import ProductIO
 from snappy import jpy
@@ -21,9 +22,12 @@ from snappy import Mask
 SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 
+direc = 'E:/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
+fname = 'S3A_OL_2_WFR_20160505T155126_6.SEN3'
+filename = direc+'/'+fname+'/'+'xfdumanifest.xml'
 
-file_path='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/MERIS/MER_FRS_2PPBCM20090518_153522_000000312079_00097_37726_0015.N1'
-product=ProductIO.readProduct(file_path)
+product=ProductIO.readProduct(filename)
+
 
 mask_file='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Lake_Erie_mask/subset_0_of_Lake_Erie_mask.dim'
 mask_product=ProductIO.readProduct(mask_file)
@@ -55,7 +59,7 @@ mask_product=ProductIO.readProduct(mask_file)
 #fig.axes.get_yaxis().set_visible(False)
 #plt.show()
 
-# get a spatial subset of the product
+# get a spatial subset of the product and mask product according to geometry defined below
 wkt = "POLYGON((-83.56861 41.5027, -82.08055 41.25472, -81.81277 41.9925, -83.32 42.27277, -83.56861 41.5027))"
 geometry = WKTReader().read(wkt)
 
@@ -69,10 +73,10 @@ op1.setSourceProduct(mask_product)
 op1.setGeoRegion(geometry)
 mask_product = op1.getTargetProduct()
 
-reflec_8=product.getBand('reflec_8')
-Widthp=reflec_8.getRasterWidth();
-Heightp=reflec_8.getRasterHeight();
-print("reflec_8 size in subset product: "+str(Widthp)+','+str(Heightp))
+Oa10=product.getBand('Oa10_reflectance')
+Widthp=Oa10.getRasterWidth();
+Heightp=Oa10.getRasterHeight();
+print("Oa10 size in subset product: "+str(Widthp)+','+str(Heightp))
 
 LE_Mask=mask_product.getBand('LE_Mask')
 Width=LE_Mask.getRasterWidth();
@@ -154,45 +158,45 @@ plt.show()
 #plt.show()
 
 # Resample operator
-#param=HashMap()
-#param.put('targetWidth',Widthp)
-#param.put('targetHeight',Heightp)
-#param.put('upsampling','Nearest')
-#mask_product = GPF.createProduct('Resample', param, mask_product)
+param=HashMap()
+param.put('targetWidth',Widthp)
+param.put('targetHeight',Heightp)
+param.put('upsampling','Nearest')
+mask_product = GPF.createProduct('Resample', param, mask_product)
 
-#LE_Mask=mask_product.getBand('LE_Mask')
-#Width=LE_Mask.getRasterWidth();
-#Height=LE_Mask.getRasterHeight();
-#print("Mask size in subset product: "+str(Width)+','+str(Height))
+LE_Mask=mask_product.getBand('LE_Mask')
+Width=LE_Mask.getRasterWidth();
+Height=LE_Mask.getRasterHeight();
+print("Mask size in subset product: "+str(Width)+','+str(Height))
 
-#LE_Mask_data = np.zeros(Width*Height, dtype=np.float32)
-#LE_Mask.readPixels(0,0,Width,Height,LE_Mask_data)
-#LE_Mask_data.shape = (Height, Width)
+LE_Mask_data = np.zeros(Width*Height, dtype=np.float32)
+LE_Mask.readPixels(0,0,Width,Height,LE_Mask_data)
+LE_Mask_data.shape = (Height, Width)
 
 # Merge operator
-#sourceProducts= HashMap()
-#sourceProducts.put('masterProduct', product)
-#sourceProducts.put('slaveProduct', mask_product)
-#parameters = HashMap()
-#parameters.put('geographicError','NaN')
-#mg_prd = GPF.createProduct('Merge', parameters, sourceProducts)
+sourceProducts= HashMap()
+sourceProducts.put('masterProduct', product)
+sourceProducts.put('slaveProduct', mask_product)
+parameters = HashMap()
+parameters.put('geographicError','NaN')
+mg_prd = GPF.createProduct('Merge', parameters, sourceProducts)
 
 # BandMaths operator
-#BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')
+BandDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor')
 
-#targetBand = BandDescriptor()
-#targetBand.name = 'CI'
-#targetBand.type = 'float32'
-#targetBand.expression = 'LE_Mask == 1 and water? (reflec_7-reflec_8) + (reflec_9 - reflec_7)*(680-664)/(708-664): NaN'
-#targetBand.noDataValue=float("nan")
-#targetBand.validExpression='CI>0'
+targetBand = BandDescriptor()
+targetBand.name = 'CI'
+targetBand.type = 'float32'
+targetBand.expression = 'LE_Mask == 1? (Oa08_reflectance-Oa10_reflectance) + (Oa11_reflectance - Oa08_reflectance)*(680-664)/(708-664): NaN'
+targetBand.noDataValue=float("nan")
+targetBand.validExpression='CI>0'
 
-#targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
-#targetBands[0] = targetBand
+targetBands = jpy.array('org.esa.snap.core.gpf.common.BandMathsOp$BandDescriptor', 1)
+targetBands[0] = targetBand
 
-#params = HashMap()
-#params.put('targetBands', targetBands)
-#result = GPF.createProduct('BandMaths', params, mg_prd)
+params = HashMap()
+params.put('targetBands', targetBands)
+result = GPF.createProduct('BandMaths', params, mg_prd)
 
 #targetBand = BandDescriptor()
 #targetBand.name = 'CI'
@@ -207,19 +211,19 @@ plt.show()
 #params.put('targetBands', targetBands)
 #result = GPF.createProduct('BandMaths', params, result)
 
-#CI=result.getBand('CI')
-#WidthCI=CI.getRasterWidth()
-#HeightCI=CI.getRasterHeight()
-#CI_data = np.zeros(WidthCI*HeightCI, dtype=np.float32)
-#CI.readPixels(0,0,WidthCI,HeightCI,CI_data)
-#CI_data.shape = (HeightCI, WidthCI)
+CI=result.getBand('CI')
+WidthCI=CI.getRasterWidth()
+HeightCI=CI.getRasterHeight()
+CI_data = np.zeros(WidthCI*HeightCI, dtype=np.float32)
+CI.readPixels(0,0,WidthCI,HeightCI,CI_data)
+CI_data.shape = (HeightCI, WidthCI)
 
-#plt.figure(figsize=(8, 8)) # adjusting the figure window size
-#fig = plt.imshow(CI_data, cmap = cm.gray) #matplotlib settings for the current image
-#fig.axes.get_xaxis().set_visible(False)
-#fig.axes.get_yaxis().set_visible(False)
-#plt.show()
-
+plt.figure(figsize=(8, 8)) # adjusting the figure window size
+fig = plt.imshow(CI_data, cmap = cm.gray) #matplotlib settings for the current image
+fig.axes.get_xaxis().set_visible(False)
+fig.axes.get_yaxis().set_visible(False)
+plt.show()
+"""
 # check if frcation of clouds is greater than a threshold (not working yet)
 # sum_le_mask=np.nansum(LE_Mask_data);
 
@@ -275,3 +279,4 @@ plt.show()
 
 # Size of algae 
 #CI_size=np.nansum(CI_data)
+"""
