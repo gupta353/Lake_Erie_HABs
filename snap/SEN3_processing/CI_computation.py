@@ -87,10 +87,10 @@ def CI_compute(direc, fname):
     # Merge product and mask product
     product=gpfOP.MergeAG(product,mask_product,'NaN')
     
-    # create a band out of water mask of product
+    # create a band out of inland water mask of product
     newBandName = 'water_mask'
     datatype = 'float32'
-    expression = 'CO_DO_WATER? 1 : 0'
+    expression = 'WQSF_lsb_INLAND_WATER? 1 : 0'
     noDataVal='nan'
     water_mask_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
     
@@ -110,7 +110,7 @@ def CI_compute(direc, fname):
     # Use BandMaths operator to compute CI
     newBandName = 'CI'
     datatype = 'float32'
-    expression = 'water_LE_mask==1? (M07_rho_w-M08_rho_w) + (M09_rho_w - M07_rho_w)*(680-664)/(708-664): NaN'
+    expression = 'water_LE_mask==1? (Oa08_reflectance-Oa10_reflectance) + (Oa11_reflectance - Oa08_reflectance)*(680-664)/(708-664): NaN'
     noDataVal='nan'
     CI_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
