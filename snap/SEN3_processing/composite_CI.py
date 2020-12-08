@@ -31,23 +31,24 @@ WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 NodeDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2010_001_2020-05-21T00-09-03'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
 # target widht and target heights of resamplig
 targetWidth=500
 targetHeight=300
 
 # read the list of products to be filtered out
+"""
 filename = direc+'/list_of_products_to_be_filtered_out.txt'
 fid = open(filename,'r')
 filter_prods = fid.read().splitlines()
 fid.close()
-
+"""
 # time-window period to create a composite image
 time_window_per=10
 
 # being and end dates
-begin_date='2010-06-30'
-end_date='2010-07-09'
+begin_date='2016-05-01'
+end_date='2016-10-31'
 
 # list the min-max dates of each time-window including begin_date
 begin_date_obj=datetime.datetime.strptime(begin_date,'%Y-%m-%d')
@@ -64,8 +65,10 @@ for ind in range(0,num_time_windows):
 
 # list the products and remove the products listed in filter_prods
 fname_list=os.listdir(direc)
+"""
 for prod in filter_prods:
     fname_list.remove(prod)    
+"""
 
 # list the dates of each product
 product_date=[]
@@ -73,13 +76,13 @@ product_datenum=[]
 product_engdate=[]
 for fname in fname_list:
     if fname.endswith("dim"):
-        x=fname.split('_')[2]
-        y=datetime.datetime.strptime(x.split('2PPBCM')[1],'%Y%m%d')
+        x=fname.split('_')[4]
+        y=datetime.datetime.strptime(x.split('T')[0],'%Y%m%d')
         z=date.toordinal(y)
         product_datenum.append(z)
         product_date.append([fname,z])
-        product_engdate.append(x.split('2PPBCM')[1])
-        
+        #product_engdate.append(x.split('2PPBCM')[1])
+
 # resample, merge products and compute composite image in each time-window
 for tw_ind in range(0,num_time_windows):
     ind=[i for i, datenum_value in enumerate(product_datenum) if(datenum_value>=time_window[tw_ind][0] and datenum_value<=time_window[tw_ind][1])] # find the indices of the product that are contained in this time-window
@@ -109,7 +112,7 @@ for tw_ind in range(0,num_time_windows):
             include_2 = NodeDescriptor()
             include_2.setProductId('slaveProduct')
             include_2.setName('CI')
-            lst_bnd[count]='CI_'+str(product_engdate[prod_ind])
+            lst_bnd[count]='CI_'+str(product_date[prod_ind][1])
             include_2.setNewName(lst_bnd[count])
                 
             include_bands = jpy.array('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor',1)
@@ -132,6 +135,6 @@ for tw_ind in range(0,num_time_windows):
         edate_obj=datetime.date.fromordinal(time_window[tw_ind][1])
         edate=str(edate_obj.year)+str(edate_obj.month)+str(edate_obj.day)
 
-        wfname='MER_FRS_2PPBCM_'+bdate+'_'+edate+'.dim'
+        wfname='S3A_OL_2_WFR_'+bdate+'_'+edate+'.dim'
         wfilename=direc+'/composite_product/'+wfname
         ProductIO.writeProduct(compositeProduct,wfilename,'BEAM-DIMAP')
