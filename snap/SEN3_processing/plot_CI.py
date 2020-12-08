@@ -19,7 +19,7 @@ import matplotlib.cm as cm
 from snappy import ProductIO
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2010_001_2020-05-21T00-09-03/composite_sd_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB\Data/remote_sensing_data/Sentinel/2016'
 
 # read product
 # list all the products with extension N1
@@ -28,7 +28,7 @@ for fname in fname_list:
     if fname.endswith(".dim"):
         file_path=direc+'/'+fname
         product=ProductIO.readProduct(file_path)
-        CI=product.getBand('composite_secchi_depth_final')
+        CI=product.getBand('CI')
         Width=CI.getRasterWidth()
         Height=CI.getRasterHeight()
         CI_data = np.zeros(Width*Height, dtype=np.float32)
@@ -42,7 +42,7 @@ for fname in fname_list:
         plt.colorbar(fraction=0.05,shrink=0.6)
 
         name=fname.split('.')
-        save_name='secchi_depth_'+name[0]+'.png'
+        save_name='CI_'+name[0]+'.png'
         savefile=direc+'/'+save_name
         plt.savefig(savefile,dpi=300,quality=100)
         plt.close()
