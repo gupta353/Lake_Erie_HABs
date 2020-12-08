@@ -90,7 +90,7 @@ def CI_compute(direc, fname):
     # create a band out of inland water mask of product
     newBandName = 'water_mask'
     datatype = 'float32'
-    expression = 'WQSF_lsb_INLAND_WATER? 1 : 0'
+    expression = 'WQSF_lsb.INLAND_WATER and WQSF_lsb.LAND ? 1 : 0'
     noDataVal='nan'
     water_mask_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
     
