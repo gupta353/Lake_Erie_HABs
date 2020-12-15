@@ -22,7 +22,8 @@ def cloud_cover(product):
     if not list(product.getBandNames()):
         return 'NaN'
  
-    # compute cloud cover over the Lake Erie
+    ## compute cloud cover over the Lake 
+    
     water_LE_mask = product.getBand('water_LE_mask')
     Height=product.getSceneRasterHeight()
     Width=product.getSceneRasterWidth()
@@ -42,7 +43,7 @@ def cloud_cover(product):
     cloud_cover=1-(water_LE_sum/total_LE_pixels)
     return cloud_cover
 
-# computation of cloud cover for the composite product (cloud cover over teyh band 'composite_CI_final')
+# computation of cloud cover for the composite product (cloud cover over teh band 'composite_CI_final')
 def cloud_cover_cmp(product):
 
     if not list(product.getBandNames()):
