@@ -134,8 +134,8 @@ for tw_ind in range(0,num_time_windows):
         eastBound = -81.78879308692983
         northBound = 42.31086488661365
         southBound = 41.1893175594222
-        pixelSizeY = 0.002
-        pixelSizeX = 0.002
+        pixelSizeY = 0.00270
+        pixelSizeX = 0.00357
 
         # mosaic water band
         varName = 'LE_mask'
