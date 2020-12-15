@@ -22,10 +22,10 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016/composite_product'
 
 # read product
-# list all the products with extension N1
+# list all the products with extension dim
 fname_list=os.listdir(direc)
 product_app = []
 CI_sum = []                 # sum of CI
@@ -52,12 +52,12 @@ for fname in fname_list:
         product_app.append(fname)
         CI_sum.append(np.nansum(CI_data))
 
-# create an list of data to be written
+# create a list of data to be written
 num = len(CI_sum)
 data = []
 for ind in range(0,num):
     split_txt = product_app[ind].split('_')
-    begin_date = split_txt[3]
+    begin_date = split_txt[4]
     dt = datetime.datetime.strptime(begin_date,'%Y%m%d')
     datenum = date.toordinal(dt)
     date_prop = date.fromordinal(datenum)
@@ -69,9 +69,9 @@ for ind in range(0,num):
 
 filename=direc+'/'+'total_CI.txt'
 fid=open(filename,'w')
-fid.write('Product_name'+'\tTotal_CI'+'\tNumber_of_pixels_positive_CI'+'\tbegin_date\n')
+fid.write('Product_name'+'\t\tTotal_CI'+'\tNumber_of_pixels_positive_CI'+'\tbegin_date\n')
 for ind in range(0,num):
-    fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\n')
+    fid.write(data[ind][0]+'\t\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\n')
 fid.close()
         
 
