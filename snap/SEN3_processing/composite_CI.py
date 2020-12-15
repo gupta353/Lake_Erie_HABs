@@ -18,6 +18,7 @@ import datetime
 import math
 import compute_composite_CI
 import re
+import gpfOP
 
 from snappy import ProductIO
 from snappy import jpy
@@ -37,12 +38,12 @@ targetWidth=500
 targetHeight=300
 
 # read the list of products to be filtered out
-"""
+
 filename = direc+'/list_of_products_to_be_filtered_out.txt'
 fid = open(filename,'r')
 filter_prods = fid.read().splitlines()
 fid.close()
-"""
+
 # time-window period to create a composite image
 time_window_per=10
 
@@ -69,6 +70,8 @@ fname_list=os.listdir(direc)
 for prod in filter_prods:
     fname_list.remove(prod)    
 """
+# remove all the products with extension other than '.dim'
+fname_list = [fname for fname in fname_list if fname.endswith('.dim')]
 
 # list the dates of each product
 product_date=[]
@@ -81,8 +84,96 @@ for fname in fname_list:
         z=date.toordinal(y)
         product_datenum.append(z)
         product_date.append([fname,z])
-        #product_engdate.append(x.split('2PPBCM')[1])
+        #product_engdate.append(x.split('2PPBCM')
 
+## create composite products
+# Create a product containing CI band (filled with) with maximum size out of the products to be listed in the same time-window
+for tw_ind in range(0,num_time_windows):
+    ind=[i for i, datenum_value in enumerate(product_datenum) if(datenum_value>=time_window[tw_ind][0] and datenum_value<=time_window[tw_ind][1])] # find the indices of the product that are contained in this time-window
+
+    if len(ind) != 0:
+        widths = []
+        heights = []
+        fname_tw = []
+        for i in ind:
+            fname = fname_list[i]
+            fname_tw.append(fname)
+            filename = direc+'/'+fname
+            product = ProductIO.readProduct(filename)
+            CI = product.getBand('CI')
+            widths.append(CI.getRasterWidth())
+            heights.append(CI.getRasterHeight())
+
+            max_width = max(widths)
+            max_height = max(heights)
+
+            i = [i for i in range(len(widths)) if widths[i]==max_width]
+
+            # create a NaN band in the product with largest width
+            fname = fname_tw[i[0]]
+            filename = direc+'/'+fname
+            product = ProductIO.readProduct(filename)
+            newBandName = 'CI'
+            datatype = 'float32'
+            expression = 'NaN'
+            noDataVal='nan'
+            composite_prod = gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal);
+
+            # create a Lake_erie_water band
+            newBandName = 'CI'
+            datatype = 'float32'
+            expression = 'WQSF_lsb_INLAND_WATER?1:0'
+            noDataVal='nan'
+            prod_tmp = gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal);
+
+            #composite_prod = gpfOP.MergeAG(composite_prod,prod_tmp,'NaN')
+            
+        ## mosaic composite_prod with other products in the time-window
+        #  mosaic parameters
+        westBound = -83.60220985614447
+        eastBound = -81.78879308692983
+        northBound = 42.31086488661365
+        southBound = 41.1893175594222
+        pixelSizeY = 0.002
+        pixelSizeX = 0.002
+
+        # mosaic water band
+        varName = 'LE_mask'
+        varExp = 'CI'
+        product1 = ProductIO.readProduct(filename)
+        LE_mask_prd = gpfOP.mosaicAG(composite_prod,prod_tmp,westBound,eastBound,northBound,southBound,pixelSizeX,pixelSizeY,varName,varExp)
+
+        count = 0
+        for fname in fname_tw:
+            count = count + 1
+            filename = direc+'/'+fname
+            varName = 'CI_'+str(count)
+            varExp = 'CI'
+            product1 = ProductIO.readProduct(filename)
+            prd_tmp = gpfOP.mosaicAG(composite_prod,product1,westBound,eastBound,northBound,southBound,pixelSizeX,pixelSizeY,varName,varExp)
+
+            newBandName = 'CI_'+str(count)
+            datatype = 'float32'
+            expression = 'CI_'+str(count)+'_count ==1?CI_'+str(count)+':NaN'
+            noDataVal = 'NaN'
+            prd_tmp = gpfOP.BandMathsAG(prd_tmp,newBandName,datatype,expression,noDataVal)
+
+            composite_prod = gpfOP.MergeAG(composite_prod,prd_tmp,'NaN')
+
+        # compute composite image
+        composite_prod = gpfOP.MergeAG(composite_prod,LE_mask_prd,'NaN')
+        compositeProduct=computeCompositeCI(composite_prod)
+                
+        # write the composite product
+        bdate_obj=datetime.date.fromordinal(time_window[tw_ind][0])
+        bdate=str(bdate_obj.year)+str(bdate_obj.month)+str(bdate_obj.day)
+        edate_obj=datetime.date.fromordinal(time_window[tw_ind][1])
+        edate=str(edate_obj.year)+str(edate_obj.month)+str(edate_obj.day)
+
+        wfname='S3A_OL_2_WFR_'+bdate+'_'+edate+'.dim'
+        wfilename=direc+'/composite_product/'+wfname
+        ProductIO.writeProduct(compositeProduct,wfilename,'BEAM-DIMAP')
+"""
 # resample, merge products and compute composite image in each time-window
 for tw_ind in range(0,num_time_windows):
     ind=[i for i, datenum_value in enumerate(product_datenum) if(datenum_value>=time_window[tw_ind][0] and datenum_value<=time_window[tw_ind][1])] # find the indices of the product that are contained in this time-window
@@ -107,7 +198,7 @@ for tw_ind in range(0,num_time_windows):
             param.put('upsampling','Nearest')
             param.put('downsampling','Mean')
             prod_tmp = GPF.createProduct('Resample', param, prod_tmp)
-
+            
             # Merge products
             include_2 = NodeDescriptor()
             include_2.setProductId('slaveProduct')
@@ -138,3 +229,4 @@ for tw_ind in range(0,num_time_windows):
         wfname='S3A_OL_2_WFR_'+bdate+'_'+edate+'.dim'
         wfilename=direc+'/composite_product/'+wfname
         ProductIO.writeProduct(compositeProduct,wfilename,'BEAM-DIMAP')
+"""
