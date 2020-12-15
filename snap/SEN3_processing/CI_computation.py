@@ -42,7 +42,7 @@ def CI_compute(direc, fname):
     mask_product=ProductIO.readProduct(mask_file)
 
     # create a subset of the product according to Lake Erie mask
-    wkt = "POLYGON((-83.7117 41.3894, -81.9583 41.1292, -81.7111 42.0236, -83.4917 42.2736, -83.7117 41.3894))"
+    wkt = "POLYGON((-83.56861 41.5027, -82.08055 41.25472, -81.81277 41.9925, -83.32 42.27277, -83.56861 41.5027))"
     product=gpfOP.subsetAG(product,wkt)
 
     # if product is empty after subset: break
@@ -110,7 +110,7 @@ def CI_compute(direc, fname):
     # Use BandMaths operator to compute CI
     newBandName = 'CI'
     datatype = 'float32'
-    expression = 'water_LE_mask==1? (Oa08_reflectance-Oa10_reflectance) + (Oa11_reflectance - Oa08_reflectance)*(680-664)/(708-664): NaN'
+    expression = 'water_mask==1? (Oa08_reflectance-Oa10_reflectance) + (Oa11_reflectance - Oa08_reflectance)*(680-664)/(708-664): NaN'
     noDataVal='nan'
     CI_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
