@@ -18,7 +18,7 @@ def computeCompositeCI(compositeProduct):
     
     # read all the CI bands
     bandnames=list(compositeProduct.getBandNames())
-    CI_bandnames=[var for var in bandnames if var.split('_')[0]=='CI' and len(var.split('_'))>1 ]
+    CI_bandnames=[var for var in bandnames if var.split('_')[0]=='CI' and len(var.split('_'))==2 ]
 
     # Apply bandmaths in for loop
     newBandName = 'composite_CI_0'
