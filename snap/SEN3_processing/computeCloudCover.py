@@ -25,7 +25,7 @@ SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016/composite_product'
 
 # compute cloud cover in for loop
 fname_list=os.listdir(direc)
@@ -35,7 +35,7 @@ for fname in fname_list:
         file_path=direc+'/'+fname
         product=ProductIO.readProduct(file_path)
         split_text = fname.split('_')
-        begin_date = split_text[3]
+        begin_date = split_text[4]
         dt = datetime.strptime(begin_date,'%Y%m%d')
         datenum = date.toordinal(dt)
         date_prop = date.fromordinal(datenum)
@@ -51,7 +51,7 @@ fid.write('product_name'+'\tcloud_cover_fraction'+'\tbegin_date\n')
 for ind in range(0,num):
     fid.write(cloud_cover[ind][0]+'\t'+str(cloud_cover[ind][1])+'\t'+str(cloud_cover[ind][2])+'\n')
 fid.close()
-
+"""
 # compute cloud cover over a subset of product (Western part of Lake Erie)
 fname_list=os.listdir(direc)
 sub_cloud_cover=[]
@@ -71,7 +71,7 @@ for fname in fname_list:
             
             # compute cloud cover
             split_text = fname.split('_')
-            begin_date = split_text[3]
+            begin_date = split_text[4]
             dt = datetime.strptime(begin_date,'%Y%m%d')
             datenum = date.toordinal(dt)
             date_prop = date.fromordinal(datenum)
@@ -90,3 +90,4 @@ fid.write('product_name'+'\tcloud_cover_fraction'+'\tbegin_date\n')
 for ind in range(0,num):
     fid.write(sub_cloud_cover[ind][0]+'\t'+str(sub_cloud_cover[ind][1])+'\t'+str(sub_cloud_cover[ind][2])+'\n')
 fid.close()
+"""
