@@ -77,3 +77,25 @@ def subsetAG(product,wkt):
     op.setGeoRegion(geometry)
     subproduct = op.getTargetProduct()
     return subproduct
+
+# mosaic operator
+def mosaicAG(product1,product2,westBound,eastBound,northBound,southBound,pixelSizeX,pixelSizeY,varName,varExpression):
+    products = jpy.array('org.esa.snap.core.datamodel.Product', 2)
+    Variable = jpy.get_type('org.esa.snap.core.gpf.common.MosaicOp$Variable')
+    vars = jpy.array('org.esa.snap.core.gpf.common.MosaicOp$Variable', 1)
+
+    products[0] = product1
+    products[1] = product2
+
+    parameters = HashMap()
+    parameters.put('westBound',westBound)
+    parameters.put('eastBound',eastBound)
+    parameters.put('northBound',northBound)
+    parameters.put('southBound',southBound)
+    parameters.put('pixelSizeY',pixelSizeY)
+    parameters.put('pixelSizeX',pixelSizeX)
+    parameters.put('variables', vars)
+
+    vars[0] = Variable(varName,varExpression);
+    Mosaic = GPF.createProduct('Mosaic', parameters, products)
+    return Mosaic
