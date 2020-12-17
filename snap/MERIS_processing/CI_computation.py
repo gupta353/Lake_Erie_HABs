@@ -110,7 +110,7 @@ def CI_compute(direc, fname):
     # Use BandMaths operator to compute CI
     newBandName = 'CI'
     datatype = 'float32'
-    expression = 'LE_Mask == 1 and water? (reflec_7-reflec_8) + (reflec_9 - reflec_7)*(680-664)/(708-664): NaN'
+    expression = 'water_mask == 1? (reflec_7-reflec_8) + (reflec_9 - reflec_7)*(680-664)/(708-664): NaN'
     noDataVal='nan'
     CI_prod=gpfOP.BandMathsAG(product,newBandName,datatype,expression,noDataVal)
 
