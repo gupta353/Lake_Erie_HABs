@@ -16,7 +16,7 @@ import os
 from snappy import ProductIO
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/MERIS_2009_full_extent_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46'
 
 # read product
 # list all the products with extension N1
