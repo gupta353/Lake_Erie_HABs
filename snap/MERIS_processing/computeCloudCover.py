@@ -52,6 +52,7 @@ for ind in range(0,num):
     fid.write(cloud_cover[ind][0]+'\t'+str(cloud_cover[ind][1])+'\t'+str(cloud_cover[ind][2])+'\n')
 fid.close()
 
+"""
 # compute cloud cover over a subset of product (Western part of Lake Erie)
 fname_list=os.listdir(direc)
 sub_cloud_cover=[]
@@ -90,3 +91,4 @@ fid.write('product_name'+'\tcloud_cover_fraction'+'\tbegin_date\n')
 for ind in range(0,num):
     fid.write(sub_cloud_cover[ind][0]+'\t'+str(sub_cloud_cover[ind][1])+'\t'+str(sub_cloud_cover[ind][2])+'\n')
 fid.close()
+"""
