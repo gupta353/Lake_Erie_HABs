@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2017/composite_product'
 
 # read product
 # list all the products with extension dim
@@ -69,9 +69,9 @@ for ind in range(0,num):
 
 filename=direc+'/'+'total_CI.txt'
 fid=open(filename,'w')
-fid.write('Product_name'+'\t\tTotal_CI'+'\tNumber_of_pixels_positive_CI'+'\tbegin_date\n')
+fid.write('Product_name'+'\tTotal_CI'+'\tNumber_of_pixels_positive_CI'+'\tbegin_date\n')
 for ind in range(0,num):
-    fid.write(data[ind][0]+'\t\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\n')
+    fid.write(data[ind][0]+'\t'+str(data[ind][1])+'\t'+str(data[ind][2])+'\t'+str(data[ind][3])+'\n')
 fid.close()
         
 
