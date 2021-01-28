@@ -12,7 +12,7 @@ clear all
 close all
 clc
 
-direc=['D:/EPA/lake_erie_HAB/lake_erie_NOAA/meteorological_data_and_webcams'];
+direc=['D:/Research/EPA_Project/Lake_Erie_HAB/Data/lake_erie_NOAA/meteorological_data'];
 
 metadata_files={'download_metadata_erie-clv_bydate',...
     'download_metadata_erie-clv_byparam',...
@@ -20,12 +20,13 @@ metadata_files={'download_metadata_erie-clv_bydate',...
     'download_metadata_erie-cmt_bydate',...
     'download_metadata_erie-cmt_csv',...
     'download_metadata_erie-rbs_csv',...
-    'download_metadata_erie-wle_bydate'};
+    'download_metadata_erie-wle_bydate',...
+    'download_metadata_erie-cmt_bydate_2016'};
 
 partial_url='https://www.glerl.noaa.gov/res/recon/data/bystation';
 
 % read each metadata file and download data
-for metadata_fileno=4%:length(metadata_files)
+for metadata_fileno=8%:length(metadata_files)
     
     % read metafile
     name=metadata_files{metadata_fileno};
@@ -38,9 +39,9 @@ for metadata_fileno=4%:length(metadata_files)
     cd(strcat(station,'_',archive_file_format))
     
     % download data
-    if strcmp(archive_file_format,'bydate')                 % if data files are arranged date-sie
+    if strcmp(archive_file_format,'bydate')                 % if data files are arranged date-wise
         
-        filename=fullfile(direc,strcat(name,'.txt'));
+        filename=fullfile(direc,'meteorological_data_and_webcams_server_files_format',strcat(name,'.txt'));
         fid=fopen(filename,'r');
         data=textscan(fid,'%s%s%s%s%s%s%d','delimiter','\t');
         fclose(fid);
@@ -57,6 +58,7 @@ for metadata_fileno=4%:length(metadata_files)
             temp_year=year{year_fileno};
             mkdir(temp_year)
             
+            % read variabls for the particular row in 'download-metadata' file
             name_format=filename_format{year_fileno};
             name_extension=filename_extension{year_fileno};
             begin_datenum=datenum(begin_date(year_fileno),'yyyymmdd');
@@ -73,6 +75,8 @@ for metadata_fileno=4%:length(metadata_files)
                 
                 url=strcat(partial_url,'/',station,'/',temp_year,'/',...
                     folder{year_fileno},'/',download_filename);
+                
+                % using webread function
                 myreadtable = @(filename)readtable(filename,...
                     'Format',strcat(repmat('%s',1,col_num)),...
                     'Delimiter','space','MultipleDelimsAsOne',1);
@@ -80,6 +84,7 @@ for metadata_fileno=4%:length(metadata_files)
                 readdata=webread(url,options);
                 write_name=strcat(temp_year,'/',download_filename);
                 writetable(readdata,write_name);
+
                 
             end
         end
