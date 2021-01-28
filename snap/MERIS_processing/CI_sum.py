@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2008_001_2020-05-20T01-12-24/composite_product'
 
 # read product
 # list all the products with extension N1
