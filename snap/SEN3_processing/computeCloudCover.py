@@ -25,7 +25,7 @@ SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2019/composite_product'
 
 # compute cloud cover in for loop
 fname_list=os.listdir(direc)
