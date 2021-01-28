@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2017/composite_product'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2020/composite_product'
 
 # read product
 # list all the products with extension dim

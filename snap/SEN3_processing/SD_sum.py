@@ -22,7 +22,7 @@ from snappy import ProductIO
 from datetime import date
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/gupta353_MERIS_full_resolution_L2_2011_001_2020-05-21T00-51-46/composite_sd_product_1'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2020/composite_sd_product'
 
 # read product
 # list all the products with extension dim
@@ -57,7 +57,7 @@ num = len(SD_sum)
 data = []
 for ind in range(0,num):
     split_txt = product_app[ind].split('_')
-    begin_date = split_txt[3]
+    begin_date = split_txt[4]
     dt = datetime.datetime.strptime(begin_date,'%Y%m%d')
     datenum = date.toordinal(dt)
     date_prop = date.fromordinal(datenum)

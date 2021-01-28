@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Wed Apr 22 20:37:51 2020
 
@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import geopandas as gpd
 import os
+import gpfOP
 
 from snappy import ProductIO
 from snappy import jpy
@@ -22,8 +23,9 @@ from snappy import Mask
 SubsetOp = jpy.get_type('org.esa.snap.core.gpf.common.SubsetOp')
 WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 
-direc = 'E:/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
-fname = 'S3A_OL_2_WFR_20160505T155126_6.SEN3'
+"""
+direc = 'D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
+fname = 'S3A_OL_2_WFR_20161010T155429_160.SEN3'
 filename = direc+'/'+fname+'/'+'xfdumanifest.xml'
 
 product=ProductIO.readProduct(filename)
@@ -60,7 +62,7 @@ mask_product=ProductIO.readProduct(mask_file)
 #plt.show()
 
 # get a spatial subset of the product and mask product according to geometry defined below
-wkt = "POLYGON((-83.56861 41.5027, -82.08055 41.25472, -81.81277 41.9925, -83.32 42.27277, -83.56861 41.5027))"
+wkt = "POLYGON((-83.7117 41.3894, -81.9583 41.1292, -81.7111 42.0236, -83.4917 42.2736, -83.7117 41.3894))"
 geometry = WKTReader().read(wkt)
 
 op = SubsetOp()
@@ -279,4 +281,96 @@ plt.show()
 
 # Size of algae 
 #CI_size=np.nansum(CI_data)
+
+
+# code for mosaicing
 """
+direc = 'D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
+fname = 'S3A_OL_2_WFR_20160801T160925_81.dim'
+filename = direc+'/'+fname
+product1 = ProductIO.readProduct(filename)
+
+fname = 'S3A_OL_2_WFR_20160803T151728_83.dim'
+filename = direc+'/'+fname
+product2 = ProductIO.readProduct(filename)
+
+# mosaicing by using the basic operator
+
+products = jpy.array('org.esa.snap.core.datamodel.Product', 2)
+Variable = jpy.get_type('org.esa.snap.core.gpf.common.MosaicOp$Variable')
+vars = jpy.array('org.esa.snap.core.gpf.common.MosaicOp$Variable', 1)
+
+products[0] = product1
+products[1] = product2
+
+parameters = HashMap()
+parameters.put('westBound',-83.60220985614447)
+parameters.put('eastBound',-81.78879308692983)
+parameters.put('northBound',42.31086488661365)
+parameters.put('southBound',41.1893175594222)
+parameters.put('pixelSizeY',0.002)
+parameters.put('pixelSizeX',0.002)
+#parameters.put('resampling','Nearest')
+parameters.put('variables', vars)
+
+vars[0] = Variable('CI_demo','CI')       
+Mosaic = GPF.createProduct('Mosaic', parameters, products)
+
+newBandName = 'CI_demo'
+datatype = 'float32'
+expression = 'CI_demo_count ==1?CI_demo:NaN'
+noDataVal = 'NaN'
+Mosaic = gpfOP.BandMathsAG(Mosaic,newBandName,datatype,expression,noDataVal)
+
+# mosaicing by using gpfOP
+
+westBound = -83.60220985614447
+eastBound = -81.78879308692983
+northBound = 42.31086488661365
+southBound = 41.1893175594222
+pixelSizeY = 0.002
+pixelSizeX = 0.002
+varName = 'CI_demo'
+varExpression = 'CI'
+Mosaic = gpfOP.mosaicAG(product1,product2,westBound,eastBound,northBound,southBound,pixelSizeX,pixelSizeY,varName,varExpression)
+
+
+reflec_8=Mosaic.getBand('CI_demo')
+Width=reflec_8.getRasterWidth();
+Height=reflec_8.getRasterHeight();
+print("reflec_8 size in sub_product: "+str(Width)+','+str(Height))
+
+reflec_8_data = np.zeros(Width*Height, dtype=np.float32)
+reflec_8.readPixels(0,0,Width,Height,reflec_8_data)
+reflec_8_data.shape = (Height, Width)
+
+plt.figure(figsize=(8, 8)) # adjusting the figure window size
+fig = plt.imshow(reflec_8_data, cmap = cm.gray) #matplotlib settings for the current image
+fig.axes.get_xaxis().set_visible(False)
+fig.axes.get_yaxis().set_visible(False)
+plt.show()
+"""
+#save_name='im4.png'
+#savefile=direc+'/'+save_name
+#plt.savefig(savefile,dpi=300,quality=100)
+#plt.close()
+"""
+wfname='mosaic_demo'
+write_filename=direc+'/'+wfname+'.dim'
+ProductIO.writeProduct(Mosaic,write_filename,'BEAM-DIMAP')
+"""
+
+# Merge LE_mask and composite product to compute cloud cover
+direc = 'D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016/composite_product'
+fname = 'S3A_OL_2_WFR_201651_2016510.dim'
+filename = direc+'/'+fname
+product1 = ProductIO.readProduct(filename)
+
+fname = 'subset_0_of_Lake_Erie_mask.dim'
+filename = 'D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Lake_Erie_mask/'+fname
+product2 = ProductIO.readProduct(filename)
+
+prd = gpfOP.MergeAG(product1,product2,'NaN')
+wfname='merge_demo'
+write_filename=direc+'/'+wfname+'.dim'
+ProductIO.writeProduct(prd,write_filename,'BEAM-DIMAP')

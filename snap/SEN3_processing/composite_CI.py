@@ -32,7 +32,7 @@ WKTReader = jpy.get_type('com.vividsolutions.jts.io.WKTReader')
 NodeDescriptor = jpy.get_type('org.esa.snap.core.gpf.common.MergeOp$NodeDescriptor')
 
 #path
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2019'
 # target widht and target heights of resamplig
 targetWidth=500
 targetHeight=300
@@ -48,8 +48,8 @@ fid.close()
 time_window_per=10
 
 # being and end dates
-begin_date='2016-05-01'
-end_date='2016-10-31'
+begin_date='2019-05-01'
+end_date='2019-10-31'
 
 # list the min-max dates of each time-window including begin_date
 begin_date_obj=datetime.datetime.strptime(begin_date,'%Y-%m-%d')
