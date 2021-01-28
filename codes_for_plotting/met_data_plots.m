@@ -9,10 +9,10 @@ station = 'erie-cmt_bydate';
 
 sp_direc = fullfile(direc,agency,'meteorological_data',station);
 
-years = {'2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015'};
+years = {'2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020'};
 year_datenum = cellfun(@(x)datenum(x,'yyyy'),years);
 %% daily air temperature
-%{
+%
 fname = 'daily_atemp.txt';
 
 filename = fullfile(sp_direc,fname);
@@ -28,7 +28,7 @@ max_par = max(par);
 scatter(datenums,par,5,'filled')
 hold on
 for y_ind = 1:length(years)
-    plot([year_datenum(y_ind) year_datenum(y_ind)],[0 max_par],'--','linewidth',1,'color','black');
+    plot([year_datenum(y_ind) year_datenum(y_ind)],[-30 max_par],'--','linewidth',1,'color','black');
 end
 box('on');
 box.linewidth=2;
@@ -45,7 +45,7 @@ fig2svg(filename)
 clear box
 %}
 %% wind speed
-%
+%{
 fname = 'daily_wspeed.txt';
 
 filename = fullfile(sp_direc,fname);
