@@ -7,11 +7,31 @@ clear all
 close all
 clc
 
-rows_tobe_removed=[793:796,815:818,7219:7221,8522:8524,9611:9613,...
-    13558:13560,13961:13963,13970:13972,13979:13981,13988:13990,...
-    13994:13996,14012:14014,14021:14023,14038:14040,14088:14090,...
-    14106:14109,17393:17395,17398:17400,17603:17605];
-direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP';
+% list the rows the be removed from the data becuase the total length of
+% time-window exceeds one day
+
+% (for Maumee river)
+% rows_tobe_removed=[792:795,814:817,7218:7220,8521:8523,9610:9612,...
+%     13557:13559,13960:13962,13969:13971,13978:13980,13987:13989,...
+%     13993:13995,14011:14013,14020:14022,14037:14039,14087:14089,...
+%     14105:14108,17392:17394,17397:17399,17602:17604];
+
+% for sandusky data
+% rows_tobe_removed = [4:6,98:105,109:111,162:165,228:231,291:293,541:544,560:562,...
+%     618:620,694:696,760:763,778:781,786:789,794:797,802:805,2338:2340,7047:7049,9196:9198,...
+%     10716:10718,11804:11806,14099:14101,14898:14900,18435:18437,18742:18744,...
+%     20830:20832,20941:20943];
+
+% for grand data
+% rows_tobe_removed = [655:658,2188:2190,3172:3174,3736:3738,4148:4150,4319:4321,...
+%     4749:4751,4999:5001,5061:5063];
+
+% for Cuyahoga data
+rows_tobe_removed = [4364:4366,6172:6174,10619:10621,10769:10771,11010:11013,11080:11083,...
+    11515:11518,12632:12634,13084:13087,14716:14718,15722:15725,...
+    15976:15978,16620:16623,16801:16804,17102:17105];
+
+direc='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP_updated';
 
 % variables to be extracted
 var_names={'Datetime_dateAndTimeOfSampleCollection_',...
@@ -23,7 +43,7 @@ var_names={'Datetime_dateAndTimeOfSampleCollection_',...
     'NO23_Mg_LAsN',...
     'TKN_Mg_L_TotalKjeldahlNitrogen_'};
 
-station_list={'maumeedata.txt'};
+station_list={'cuyahogadata.txt'};
 
 datesplit_wrapper=@(x)strsplit(x,char(32));
 datenum_wrapper=@(x)datenum(x,'mm/dd/yyyy HH:MM');
@@ -46,7 +66,7 @@ for station_ind=1:length(station_list)          % read data contained in excel f
         
         % streamflow and other properties
         strm=T.(var_names{3});
-        strm=cellfun(@str2double,strm);
+%         strm=cellfun(@str2double,strm);
         % find indices that correspond to negative streamflow
         ind_strm=find(strm>0);
         ind_tw=intersect(ind_tw,ind_strm);
