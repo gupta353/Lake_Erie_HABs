@@ -6,7 +6,7 @@ This routine shortens the filenames of Sentinel-3 files and stores the actual fi
 import sys
 import os
 
-direc = 'E:/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2016'
+direc = 'E:/Lake_Erie_HAB/Data/remote_sensing_data/Sentinel/2020'
 fnames = os.listdir(direc)
 
 
