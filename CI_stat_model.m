@@ -208,7 +208,47 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'obs_pred_log_CI_cross_validation_cc10_removed.svg';
+% fname = 'obs_pred_log_CI_cross_validation_cc10_removed.svg';
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
+% fig2svg(filename)
+
+% Uncertainty analysis of residuals
+res = CI - Fitted_val;
+std_dev = std(res);
+upper_bound = Fitted_val + 2*std_dev;
+lower_bound = Fitted_val - 2*std_dev;
+
+% uncertainty plot
+figure;
+plot(Fitted_val,'linewidth',2); hold on;
+scatter(1:length(CI),CI,'filled')
+plot(upper_bound,'r','linewidth',2)
+plot(lower_bound,'r','linewidth',2)
+
+xlabel('Sample number','fontname','arial','fontsize',12)
+ylabel('log(CI)','fontname','arial','fontsize',12)
+box('on')
+box.linewidth = 2;
+set(gca,'fontname','arial','fontsize',12,box)
+clear box
+legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
+legend('boxoff');
+
+fname = 'Uncertainty_analysis_cross_validation_cc10_removed.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
+fig2svg(filename)
+
+% QQ plot
+figure;
+qqplot(res);
+box('on')
+box.linewidth = 2;
+set(gca,'fontname','arial','fontsize',12,box)
+clear box
+
+fname = 'qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
+
+
