@@ -6,22 +6,23 @@ clear all
 close all
 clc
 
-direc_htlp='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP';
+direc_htlp='D:/Research/EPA_Project/Lake_Erie_HAB/Data/HTLP_updated';
 datenum_wrapper=@(x)datenum(x,'mm/dd/yyyy');
 strsplit_wrapper=@(x)strsplit(x,'/');
 calib_samples=30;                       % number of samples used for calibration
 
 % read wq concentration data
-fname_htlp='daily_maumeedata.txt';
+fname_htlp='daily_granddata.txt';
 filename=fullfile(direc_htlp,fname_htlp);
 data=readtable(filename,'delimiter','\t');
 date_wq=data.(1);
 datenum_wq=cellfun(datenum_wrapper,date_wq);
-wq_conc=data.SRP_Mg_L_AsP;
+wq_conc=data.NO23_Mg_LAsN;
 wq_conc(wq_conc<0)=NaN;
+name = 'NO23';    % to be used as a name for the textfile where reconstructed data will saved
 
 % read streamflow data
-fname='maumee.txt';
+fname='grand.txt';
 filename=fullfile(direc_htlp,'streamflow',fname);
 data=readtable(filename,'delimiter','\t');
 date_strm=data.(1);
@@ -88,7 +89,7 @@ for i=1:length(nan_inds)
 end
 wq_load=wq_conc_tmp.*strm*(10^(-3)/35.3*24*3600);   % WQ load in Kg/day
 % save reconstructed wq concentration data
-sname='maumee_reconstructed_SRP_conc.txt';
+sname=['grand_reconstructed_',name,'_conc.txt'];
 save_filename=fullfile(direc_htlp,sname);
 fid=fopen(save_filename,'w');
 fprintf(fid,'%s\t%s\t%s\t%s\n','Date','SRP(mg/L)','streamflow(cfs)','SRP_load(Kg/day)');
