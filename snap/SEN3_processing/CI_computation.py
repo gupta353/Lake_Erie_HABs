@@ -126,5 +126,5 @@ def CI_compute(direc, fname):
 
     # write product to a new file
     wfname=os.path.splitext(fname)[0]
-    write_filename=direc+'/'+wfname+'.dim'
+    write_filename=direc+'/'+'CI_product/'+wfname+'.dim'
     ProductIO.writeProduct(product,write_filename,'BEAM-DIMAP')
