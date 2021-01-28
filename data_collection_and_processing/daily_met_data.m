@@ -9,11 +9,11 @@ direc = 'D:/Research/EPA_Project/Lake_Erie_HAB/Data/';
 agency = 'lake_erie_NOAA';
 station = 'erie-cmt_bydate';
 
-sp_direc = fullfile(direc,agency,'meteorological_data',station);
+sp_direc = fullfile(direc,agency,'meteorological_data',station,'fine_timescale_data');
 
-fname = 'wspped_avg.txt';
-wfname = 'daily_wspped_avg.txt';
-header='wind_spped(m/s)';
+fname = 'atemp.txt';
+wfname = 'daily_min_atemp.txt';
+header='atemp(DegC)';
 
 filename = fullfile(sp_direc,fname);
 fid = fopen(filename,'r');
@@ -35,7 +35,7 @@ datenum_tmp = floor(uni_datenums/10^5);
 uni_datenums(datenum_tmp~=7)=[];
 
 % remove all the data after labeled to be collected 2020
-ind = find(uni_datenums>datenum('2020-01-01','yyyy-mm-dd'));
+ind = find(uni_datenums>datenum('2021-01-01','yyyy-mm-dd'));
 uni_datenums(ind)=[];
 
 for date_ind = 1:length(uni_datenums)
@@ -43,14 +43,14 @@ for date_ind = 1:length(uni_datenums)
     ind = find(datenums==uni_datenums(date_ind));
     tmp_data = data(ind,7);
     tmp_data(isnan(tmp_data)) = [];
-    avg_par(date_ind) = mean(tmp_data);
+    avg_par(date_ind) = min(tmp_data);
 
 end
 
 % remove any negative values from the averaged data
-ind = find(avg_par<0);
-avg_par(ind) = [];
-uni_datenums(ind) = [];
+% ind = find(avg_par<0);
+% avg_par(ind) = [];
+% uni_datenums(ind) = [];
 
 % write data to a text file
 wfilename = fullfile(sp_direc,wfname);
