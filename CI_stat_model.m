@@ -64,8 +64,8 @@ preds(:,end) = [];
 %
 rng(1);
 count = 0;
-while count<1000
-    count = count+1
+parfor count = 1:1000
+    
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
@@ -138,7 +138,7 @@ R21=corr(CI_val,Fitted_val)^2;
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
-    Fitted_val = beta(1,count) + preds_val*beta(2:end,count);
+    Fitted_val =  [ones(size(preds_val,1),1) preds_val]*beta(:,count);
     
 %     scatter(CI_val,Fitted_val,'filled'); hold on
 %     ylim([0 10])
