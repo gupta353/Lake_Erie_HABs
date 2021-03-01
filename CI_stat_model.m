@@ -8,28 +8,44 @@ clc
 fname = 'model_data.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
-formatspec = ['%s',repmat('%f',1,18)];
+formatspec = ['%s',repmat('%f',1,63)];
 data = textscan(fid,formatspec,'delimiter','\t','headerlines',1);
 fclose(fid);
 
 dates = data{1};
 CI = data{2};
 preds = cat(2,data{3:end});
-preds(:,1:6) = [];
+preds(:,1:24) = [];
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
 % preds = [preds,month_num];
-pred_name = {'CI','Minimum wind speed','Maximum air temperature','Average TP','Average TKN','Ratio of TP to TKN','Average streamflow','Secchi depth','TP load from Mar to Jun','TKN load from Jan to Jun'};
-
+pred_name = {'CI','Minimum wind speed','Average wind speed','Maximum wind speed','Minimum air temperature','Average air temperature','Maximum air temperature',...
+    'Average TP Maumee','Average TP Raisin','Average TP Sandusky','Average TP Cuyahoga',...
+    'Average TKN Maumee','Average TKN Raisin','Average TKN Sandusky','Average TKN Cuyahoga',...
+    'Average streamflow Maumee','Average streamflow Raisin','Average streamflow Sandusky','Average streamflow Cuyahoga',...
+    'Ratio of TP to TKN Maumee','Ratio of TP to TKN Raisin','Ratio of TP to TKN Sandusky','Ratio of TP to TKN Cuyahoga',...
+    'Average solar radiation','Average water level','Secchi depth',...
+    'Spring TP Maumee','Spring TP Raisin','Spring TP Sandusky','Spring TP Cuyahoga',...
+    'Jan to Jun TKN Maumee','Jan to Jun TKN Raisin','Jan to Jun TKN Sandusky','Jan to Jun TKN Cuyahoga',...
+    'Legacy TP Maumee','Legacy TP Raisin','Legacy TP Sandusky','Legacy TP Cuyahoga'};
 
 % read cloud cover data
-fname = 'cloud_cover_combined_MERIS.txt';
+fname = 'cloud_cover_MERIS_SEN.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','Data/remote_sensing_data',fname);
 fid = fopen(filename,'r');
 data = textscan(fid,'%s%f','delimiter','\t','headerlines',1);
 fclose(fid)
 cc_dates = data{1};
 cc = data{2};
+% remove 2020 data
+cc_datenums = cellfun(@(x)datenum(x,'yyyy-mm-dd'),cc_dates);
+ind = find(cc_datenums>=datenum('01/01/2020','mm/dd/yyyy'));
+cc_dates(ind)  = [];
+cc(ind) = [];
+
+% covert CIs into logarithmic scale
+CI = log(CI);
+preds(:,2) = log(preds(:,2));
 
 % remove outliers and missing values
 zero_ind = find(cc>0.10 | isnan(preds(:,2)));
@@ -38,22 +54,22 @@ preds(zero_ind,:) = [];
 dates(zero_ind) = [];
 
 % normalize the predictor variables
-preds_m = mean(preds);
-preds_std = std(preds);
+preds_m = nanmean(preds);
+preds_std = nanstd(preds);
 preds = bsxfun(@minus,preds,preds_m);
 preds = preds./repmat(preds_std,size(preds,1),1);
 preds(:,end) = [];
 
 % calibration and validation data
-%{
+%
 rng(1);
 count = 0;
 while count<1000
-    count = count+1;
-    cal_ind = randsample(length(CI),60);
+    count = count+1
+    cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
-    CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
-    CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
+    CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
+    CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     % stratified sampling
     % data = [CI,preds];
@@ -119,7 +135,7 @@ R21=corr(CI_val,Fitted_val)^2;
     
     % lasso regression
     %
-    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.0001,'CV',10);
+    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val = beta(1,count) + preds_val*beta(2:end,count);
@@ -128,9 +144,9 @@ R21=corr(CI_val,Fitted_val)^2;
 %     ylim([0 10])
 %     xlim([0 10])
 %     plot([0 10],[0 10],'color','black','linewidth',2)
-%     
-%     R21(count)=corr(CI_val,Fitted_val)^2;
-%     lambda(count) = Fitinfo.LambdaMinMSE;
+    
+    R21(count)=corr(CI_val,Fitted_val)^2;
+    lambda(count) = Fitinfo.LambdaMinMSE;
 %     R21_tmp = (round(R21(count)*100))/100;
 %     title(['R^2 = ',num2str(R21_tmp)]);
 %     
@@ -139,30 +155,30 @@ R21=corr(CI_val,Fitted_val)^2;
 %     box('on')
 %     box.linewidth = 2;
 %     set(gca,'fontname','arial','fontsize',12,box)
-%     pause;
+%     pause(1);
 %     clear box
-    
-    %     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    %     filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
-    %     print(filename,'-r300','-djpeg')
+%     
+%     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
+%     filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
+%     print(filename,'-r300','-djpeg')
 %     close all
     
 end
 %}
-% hist(R21)
-% xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
-% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-% fname = strcat('R2_histogram.svg');
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
-% fig2svg(filename);
-% %
-% hist(lambda)
-% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-% fname = strcat('lambda_histogram.svg');
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
-% fig2svg(filename);
-%{
+hist(R21)
+xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
+ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+fname = strcat('R2_histogram.svg');
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
+fig2svg(filename);
+%
+hist(lambda)
+xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+fname = strcat('lambda_histogram.svg');
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
+fig2svg(filename);
+%
 for pind = 1:length(pred_name)
     
     hist(beta(1+pind,:))
@@ -177,8 +193,7 @@ fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation) lasso
-%
-CI = log(CI);
+%{
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -186,7 +201,7 @@ for CI_ind =  1:length(CI)
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
-    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.0001,'CV',10);
+    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.001,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
@@ -208,11 +223,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-% fname = 'obs_pred_log_CI_cross_validation_cc10_removed.svg';
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
-% fig2svg(filename)
-
+fname = 'obs_pred_log_CI_cross_validation_cc10_removed.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
+fig2svg(filename)
+%}
 % Uncertainty analysis of residuals
+%{
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
