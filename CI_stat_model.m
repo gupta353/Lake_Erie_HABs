@@ -61,7 +61,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 count = 0;
 for count = 1:1000
@@ -164,7 +164,7 @@ R21=corr(CI_val,Fitted_val)^2;
     close all
     
 end
-%}
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -194,7 +194,7 @@ fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation) lasso
-%{
+%
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -202,7 +202,7 @@ for CI_ind =  1:length(CI)
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
-    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.001,'CV',5);
+    [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
@@ -229,7 +229,7 @@ filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',f
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%{
+%
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
@@ -246,12 +246,12 @@ xlabel('Sample number','fontname','arial','fontsize',12)
 ylabel('log(CI)','fontname','arial','fontsize',12)
 box('on')
 box.linewidth = 2;
-set(gca,'fontname','arial','fontsize',12,box)
+set(gca,'fontname','arial','fontsize',12,'plotboxaspectratio',[2 1 1],'xlim',[0 180],box)
 clear box
 legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
 legend('boxoff');
 
-fname = 'Uncertainty_analysis_cross_validation_cc10_removed.svg';
+fname = 'lasso_uncertainty_analysis_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 
