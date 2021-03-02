@@ -58,13 +58,13 @@ preds_m = nanmean(preds);
 preds_std = nanstd(preds);
 preds = bsxfun(@minus,preds,preds_m);
 preds = preds./repmat(preds_std,size(preds,1),1);
-preds(:,end) = [];
+% preds(:,end) = [];
 
 % calibration and validation data
 %
 rng(1);
 count = 0;
-parfor count = 1:1000
+for count = 1:1000
     
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
@@ -140,28 +140,28 @@ R21=corr(CI_val,Fitted_val)^2;
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val =  [ones(size(preds_val,1),1) preds_val]*beta(:,count);
     
-%     scatter(CI_val,Fitted_val,'filled'); hold on
-%     ylim([0 10])
-%     xlim([0 10])
-%     plot([0 10],[0 10],'color','black','linewidth',2)
+    scatter(CI_val,Fitted_val,'filled'); hold on
+    ylim([2 8])
+    xlim([2 8])
+    plot([0 10],[0 10],'color','black','linewidth',2)
     
     R21(count)=corr(CI_val,Fitted_val)^2;
     lambda(count) = Fitinfo.LambdaMinMSE;
-%     R21_tmp = (round(R21(count)*100))/100;
-%     title(['R^2 = ',num2str(R21_tmp)]);
-%     
-%     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
-%     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
-%     box('on')
-%     box.linewidth = 2;
-%     set(gca,'fontname','arial','fontsize',12,box)
+    R21_tmp = (round(R21(count)*100))/100;
+    title(['R^2 = ',num2str(R21_tmp)]);
+    
+    xlabel('Observed log(CI)','fontname','arial','fontsize',12)
+    ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
+    box('on')
+    box.linewidth = 2;
+    set(gca,'fontname','arial','fontsize',12,box)
 %     pause(1);
-%     clear box
-%     
-%     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-%     filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-%     print(filename,'-r300','-djpeg')
-%     close all
+    clear box
+    
+    fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
+    print(filename,'-r300','-djpeg')
+    close all
     
 end
 %}
@@ -169,7 +169,7 @@ hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
 fig2svg(filename);
 %
 hist(lambda)
@@ -182,13 +182,14 @@ fig2svg(filename);
 for pind = 1:length(pred_name)
     
     hist(beta(1+pind,:))
-    xlabel(pred_name{pind},'fontname','arial','fontsize',12);
+    xlabel(num2str(pind),'fontname','arial','fontsize',12);
 end
 
-boxplot(beta(2:end,:)',pred_name);
+boxplot(beta(2:end,:)',1:38);
 ylabel('Regression coefficients','fontname','arial','fontsize',12)
+set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
 fname = 'coefficient_distribtuion.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/ridge_regression_plots_2',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
 fig2svg(filename);
 %}
 %}
