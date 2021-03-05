@@ -61,7 +61,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
 for count = 1:1000
@@ -79,7 +79,7 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-    %
+    %{
     % cross-validation
     NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
@@ -142,15 +142,15 @@ for count = 1:1000
     
     %% linear regression
     %{
-mdl=fitlm(preds_cal,CI_cal);
-Fitted_val = predict(mdl,preds_val);
-
-scatter(CI_val,Fitted_val); hold on
-ylim([0 10])
-xlim([0 10])
-plot([0 10],[0 10],'color','black')
-
-R21=corr(CI_val,Fitted_val)^2;
+    mdl=fitlm(preds_cal,CI_cal);
+    Fitted_val = predict(mdl,preds_val);
+    
+    scatter(CI_val,Fitted_val); hold on
+    ylim([0 10])
+    xlim([0 10])
+    plot([0 10],[0 10],'color','black')
+    
+    R21=corr(CI_val,Fitted_val)^2;
     %}
     
     %% lasso regression
@@ -184,7 +184,8 @@ R21=corr(CI_val,Fitted_val)^2;
     close all
     %}
 end
-%
+%}
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -213,8 +214,8 @@ filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/RF
 fig2svg(filename);
 %}
 %}
-%% cross-validation (no validation) lasso
-%{
+%% cross-validation (no validation)
+%
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -222,10 +223,37 @@ for CI_ind =  1:length(CI)
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
+    %% LASSO
+    %{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
+    %}
+    
+    %% Random Forest
+     NumTrees=25:25:100;
+    NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
+    MinLeaf=2:2:6;
+    
+    rcount = 0;
+    for par1_ind = 1:length(NumTrees)
+        for par2_ind = 1:length(NVarToSample)
+            for par3_ind = 1:length(MinLeaf)
+                rcount = rcount+1;
+                
+                predfun = @(Xtrain,ytrain,Xtest)RFag(Xtrain,ytrain,Xtest,NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind));
+                val = crossval('mse',preds_cal,CI_cal,'predfun',predfun);
+                mse(rcount,:) = [NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind),val];
+            
+            end
+        end
+    end
+    
+    ind = find(mse(:,4) == min(mse(:,4)));
+    B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
+        'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
+    Fitted_val(CI_ind,1)=predict(B,preds_val);
     
 end
 
@@ -244,12 +272,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%{
+%
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
@@ -271,7 +299,7 @@ clear box
 legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
 legend('boxoff');
 
-fname = 'lasso_uncertainty_analysis_cross_validation_cc10_removed.svg';
+fname = 'RF_uncertainty_analysis_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 
@@ -283,7 +311,7 @@ box.linewidth = 2;
 set(gca,'fontname','arial','fontsize',12,box)
 clear box
 
-fname = 'qqplot_cross_validation_cc10_removed.svg';
+fname = 'RF_qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
