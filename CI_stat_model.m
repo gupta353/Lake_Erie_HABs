@@ -61,10 +61,10 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%{
+%
 rng(1);
 
-for count = 1:1000
+for count = 1:10%:1000
     
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
@@ -183,6 +183,39 @@ for count = 1:1000
     print(filename,'-r300','-djpeg')
     close all
     %}
+    
+    %% Gaussian processes
+    % divide the entire data into k uniform folds
+    k = 1;                                                % number of folds for cross-validation
+    c = cvpartition(CI_cal,'holdout',0.5);
+    % minimize objective function
+    loss=@(theta)GPRobj(theta,preds_cal,CI_cal,k,c);      % loss function
+    parent = ones(1,40);
+    lb = 0.001*ones(1,40);                 % lower bound
+    ub = 1000*ones(1,40);                                  % upper bound
+    options = optimset('TolFun',10^-8,'MaxFunEvals',1000);
+    [theta_opt,fval] = simulannealbnd(loss,parent,lb,ub,options);
+    
+    train_idx = training(c,1);
+    test_idx = test(c,1);
+    Fitted_val = GPPred(theta_opt,preds_cal(train_idx,:),CI_cal(train_idx,:),preds_val)';
+    
+    scatter(CI_val,Fitted_val,'filled'); hold on
+    ylim([2 8])
+    xlim([2 8])
+    plot([0 10],[0 10],'color','black','linewidth',2); hold off
+    
+    R21(count)=corr(CI_val,Fitted_val)^2;
+    R21_tmp = (round(R21(count)*100))/100;
+    title(['R^2 = ',num2str(R21_tmp)]);
+    
+    xlabel('Observed log(CI)','fontname','arial','fontsize',12)
+    ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
+    box('on')
+    box.linewidth = 2;
+    set(gca,'fontname','arial','fontsize',12,box)
+    pause;
+    clear box
 end
 %}
 %{
@@ -215,7 +248,7 @@ fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation)
-%
+%{
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -232,6 +265,7 @@ for CI_ind =  1:length(CI)
     %}
     
     %% Random Forest
+    %{
      NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -254,7 +288,7 @@ for CI_ind =  1:length(CI)
     B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
     Fitted_val(CI_ind,1)=predict(B,preds_val);
-    
+    %}
 end
 
 scatter(CI,Fitted_val,'filled'); hold on
@@ -277,7 +311,7 @@ filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',f
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%
+%{
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
