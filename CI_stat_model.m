@@ -62,7 +62,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%{
+%
 rng(1);
 
 for count = 1:1000
@@ -222,7 +222,7 @@ for count = 1:1000
     
 end
 %}
-%{
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -253,7 +253,7 @@ fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation)
-%
+%{
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -262,7 +262,7 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-    %
+    %{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
