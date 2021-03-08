@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data.txt';
+fname = 'model_data_10.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,63)];
@@ -43,15 +43,16 @@ ind = find(cc_datenums>=datenum('01/01/2020','mm/dd/yyyy'));
 cc_dates(ind)  = [];
 cc(ind) = [];
 
-% covert CIs into logarithmic scale
-CI = log(CI);
-preds(:,2) = log(preds(:,2));
-
-% remove outliers and missing values
-zero_ind = find(cc>0.10 | isnan(preds(:,2)));
+% remove outliers, zero CI values and missing values
+zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0);
 CI(zero_ind) = [];
 preds(zero_ind,:) = [];
 dates(zero_ind) = [];
+
+% covert CIs into logarithmic scale
+CI = log(CI);
+% preds(:,1) = log(preds(:,1));
+
 
 % normalize the predictor variables
 preds_m = nanmean(preds);
@@ -61,10 +62,10 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
-for count = 1:10%:1000
+for count = 1:1000
     
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
@@ -154,7 +155,7 @@ for count = 1:10%:1000
     %}
     
     %% lasso regression
-    %{
+    %
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -165,7 +166,8 @@ for count = 1:10%:1000
     xlim([2 8])
     plot([0 10],[0 10],'color','black','linewidth',2)
     
-    R21(count)=corr(CI_val,Fitted_val)^2;
+    R21(count) = corr(CI_val,Fitted_val)^2;
+    rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
     lambda(count) = Fitinfo.LambdaMinMSE;
     R21_tmp = (round(R21(count)*100))/100;
     title(['R^2 = ',num2str(R21_tmp)]);
@@ -186,6 +188,7 @@ for count = 1:10%:1000
     
     %% Gaussian processes
     % divide the entire data into k uniform folds
+    %{
     k = 1;                                                % number of folds for cross-validation
     c = cvpartition(CI_cal,'holdout',0.5);
     % minimize objective function
@@ -216,6 +219,7 @@ for count = 1:10%:1000
     set(gca,'fontname','arial','fontsize',12,box)
     pause;
     clear box
+    
 end
 %}
 %{
@@ -226,29 +230,30 @@ fname = strcat('R2_histogram.svg');
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
 fig2svg(filename);
 %
-% hist(lambda)
-% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-% fname = strcat('lambda_histogram.svg');
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/RF_regression_plots_1',fname);
-% fig2svg(filename);
-%{
-for pind = 1:length(pred_name)
-    
-    hist(beta(1+pind,:))
-    xlabel(num2str(pind),'fontname','arial','fontsize',12);
-end
+hist(lambda)
+xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+fname = strcat('lambda_histogram.svg');
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
+fig2svg(filename);
+%
+% for pind = 1:length(pred_name)
+%     
+%     hist(beta(1+pind,:))
+%     xlabel(num2str(pind),'fontname','arial','fontsize',12);
+% end
 
-boxplot(importance,1:38);
+beta_plot = beta(2:end,:);
+boxplot(beta_plot',1:38);
 ylabel('Regression coefficients','fontname','arial','fontsize',12)
 set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
 fname = 'coefficient_distribtuion.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/RF_regression_plots_1',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
 fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation)
-%{
+%
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -257,7 +262,7 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-    %{
+    %
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -306,12 +311,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%{
+%
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
@@ -333,7 +338,7 @@ clear box
 legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
 legend('boxoff');
 
-fname = 'RF_uncertainty_analysis_cross_validation_cc10_removed.svg';
+fname = 'lasso_uncertainty_analysis_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 
@@ -345,7 +350,7 @@ box.linewidth = 2;
 set(gca,'fontname','arial','fontsize',12,box)
 clear box
 
-fname = 'RF_qqplot_cross_validation_cc10_removed.svg';
+fname = 'lasso_qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
