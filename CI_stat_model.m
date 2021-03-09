@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data_10.txt';
+fname = 'model_data_20.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,63)];
@@ -44,7 +44,7 @@ cc_dates(ind)  = [];
 cc(ind) = [];
 
 % remove outliers, zero CI values and missing values
-zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0);
+zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)));
 CI(zero_ind) = [];
 preds(zero_ind,:) = [];
 dates(zero_ind) = [];
@@ -52,7 +52,6 @@ dates(zero_ind) = [];
 % covert CIs into logarithmic scale
 CI = log(CI);
 % preds(:,1) = log(preds(:,1));
-
 
 % normalize the predictor variables
 preds_m = nanmean(preds);
@@ -220,8 +219,9 @@ for count = 1:1000
     pause;
     clear box
     
-end
+
 %}
+end
 %
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
@@ -311,12 +311,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%
+%{
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
@@ -338,7 +338,7 @@ clear box
 legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
 legend('boxoff');
 
-fname = 'lasso_uncertainty_analysis_cross_validation_cc10_removed.svg';
+fname = 'RF_uncertainty_analysis_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 
@@ -350,7 +350,7 @@ box.linewidth = 2;
 set(gca,'fontname','arial','fontsize',12,box)
 clear box
 
-fname = 'lasso_qqplot_cross_validation_cc10_removed.svg';
+fname = 'RF_qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
