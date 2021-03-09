@@ -61,7 +61,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
 for count = 1:1000
@@ -154,7 +154,7 @@ for count = 1:1000
     %}
     
     %% lasso regression
-    %
+    %{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -253,7 +253,7 @@ fig2svg(filename);
 %}
 %}
 %% cross-validation (no validation)
-%{
+%
 for CI_ind =  1:length(CI)
     
     val_ind = CI_ind;
@@ -262,7 +262,7 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-    %{
+    %
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -311,12 +311,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%{
+%
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
@@ -338,7 +338,7 @@ clear box
 legend({'Predicted','Observed','95% prediction interval'},'fontname','arial','fontsize',12,'location','northwest')
 legend('boxoff');
 
-fname = 'RF_uncertainty_analysis_cross_validation_cc10_removed.svg';
+fname = 'lasso_uncertainty_analysis_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 
@@ -350,7 +350,7 @@ box.linewidth = 2;
 set(gca,'fontname','arial','fontsize',12,box)
 clear box
 
-fname = 'RF_qqplot_cross_validation_cc10_removed.svg';
+fname = 'lasso_qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
