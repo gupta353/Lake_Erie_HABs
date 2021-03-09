@@ -404,16 +404,16 @@ data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_at
     avg_TKN_maumee',avg_TKN_raisin',avg_TKN_sandusky',avg_TKN_cuyahoga',...
     avg_strm_maumee',avg_strm_raisin',avg_strm_sandusky',avg_strm_cuyahoga',...
     TN_TP_ratio_maumee',TN_TP_ratio_raisin',TN_TP_ratio_sandusky',TN_TP_ratio_cuyahoga',avg_SR',avg_WL',avg_sd'];
-break
+
 %% add previous time-step data
 data = sortrows(data);                      % arrange the data in increasing order of dates
 data = [data,NaN*ones(size(data,1),26)];     
 
-for dind = 3:size(data,1)
+for dind = 4:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-2,1)==20
-        data(dind,28:end) = data(dind-2,2:27);
+    if datenum_tmp - data(dind-3,1)==30
+        data(dind,28:end) = data(dind-3,2:27);
     end
     
 end
@@ -435,7 +435,7 @@ for dind = 1:size(data,1)
         tot_legacy_TP_maumee(ind),tot_legacy_TP_raisin(ind),tot_legacy_TP_sandusky(ind),tot_legacy_TP_cuyahoga(ind)];
     
 end
-
+break
 % save data to a textfile
 fname = 'model_data.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
