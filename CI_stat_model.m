@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data_20.txt';
+fname = 'model_data_10.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,63)];
@@ -52,6 +52,7 @@ dates(zero_ind) = [];
 % covert CIs into logarithmic scale
 CI = log(CI);
 % preds(:,1) = log(preds(:,1));
+preds(:,2:4) = preds(:,2:4).^2;
 
 % normalize the predictor variables
 preds_m = nanmean(preds);
@@ -66,6 +67,7 @@ rng(1);
 
 for count = 1:1000
     
+    disp(count)
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
@@ -168,21 +170,21 @@ for count = 1:1000
     R21(count) = corr(CI_val,Fitted_val)^2;
     rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
     lambda(count) = Fitinfo.LambdaMinMSE;
-    R21_tmp = (round(R21(count)*100))/100;
-    title(['R^2 = ',num2str(R21_tmp)]);
-    
-    xlabel('Observed log(CI)','fontname','arial','fontsize',12)
-    ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
-    box('on')
-    box.linewidth = 2;
-    set(gca,'fontname','arial','fontsize',12,box)
-%     pause(1);
-    clear box
-    
-    fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-    print(filename,'-r300','-djpeg')
-    close all
+%     R21_tmp = (round(R21(count)*100))/100;
+%     title(['R^2 = ',num2str(R21_tmp)]);
+%     
+%     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
+%     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
+%     box('on')
+%     box.linewidth = 2;
+%     set(gca,'fontname','arial','fontsize',12,box)
+% %     pause(1);
+%     clear box
+%     
+%     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
+%     filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
+%     print(filename,'-r300','-djpeg')
+%     close all
     %}
     
     %% Gaussian processes
@@ -222,7 +224,7 @@ for count = 1:1000
 
 %}
 end
-%
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -262,7 +264,7 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-    %{
+    %
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -270,7 +272,7 @@ for CI_ind =  1:length(CI)
     %}
     
     %% Random Forest
-    %
+    %{
      NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -311,12 +313,12 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_wind_speed_squared.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
 %}
 % Uncertainty analysis of residuals
-%
+%{
 res = CI - Fitted_val;
 std_dev = std(res);
 upper_bound = Fitted_val + 2*std_dev;
