@@ -363,7 +363,7 @@ for year_ind = 1:length(years_datenum)
     
 end
 
-% add previous 10 years of TP
+%% add previous 10 years of TP
 years = {'2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2016','2017','2018','2019'};
 years_datenum = cellfun(@(x)datenum(x,'yyyy'),years);
 
@@ -399,6 +399,7 @@ for year_ind = 1:length(years_datenum)
 end
 
 %% compute TP, TKN and streamflow integrated in time within last 20,30,40,50,and 60 days
+%{
 for dind = 1:length(CI_datenums)
     
     %% average TP within last 20,30, 40,50,and 60 days
@@ -560,9 +561,9 @@ for dind = 1:length(CI_datenums)
     ind = find(strm_datenums_cuyahoga<CI_datenums(dind) & strm_datenums_cuyahoga>=CI_datenums(dind)-60);
     avg_strm_cuyahoga_60(dind) = nanmean(strm_vals_cuyahoga(ind));
 end
-
+%}
 %% arrange data in a matrix
-%{
+%
 data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_atemp',...
     avg_TP_maumee',avg_TP_raisin',avg_TP_sandusky',avg_TP_cuyahoga',...
     avg_TKN_maumee',avg_TKN_raisin',avg_TKN_sandusky',avg_TKN_cuyahoga',...
@@ -573,11 +574,11 @@ data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_at
 data = sortrows(data);                      % arrange the data in increasing order of dates
 data = [data,NaN*ones(size(data,1),26)];     
 
-for dind = 4:size(data,1)
+for dind = 2:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-3,1)==30
-        data(dind,28:end) = data(dind-3,2:27);
+    if datenum_tmp - data(dind-1,1)==10
+        data(dind,28:end) = data(dind-1,2:27);
     end
     
 end
@@ -600,12 +601,66 @@ for dind = 1:size(data,1)
     
 end
 
+%% compute average (or minimum or maximum) of met and TP data which have maximum correlation with CI values
+for dind = 1:length(CI_datenums)
+       
+    % max air temperature
+    ind = find(max_atemp_datenums>=CI_datenums(dind)-30 & max_atemp_datenums<=CI_datenums(dind)-21);
+    max_atemp_corr(dind) = max([max_atemp_vals(ind);NaN]);
+    
+    % min air temperature
+    ind = find(min_atemp_datenums>=CI_datenums(dind)-30 & min_atemp_datenums<=CI_datenums(dind)-21);
+    min_atemp_corr(dind) = min([min_atemp_vals(ind);NaN]);
+    
+    % mean air temperature
+    ind = find(mean_atemp_datenums>=CI_datenums(dind)-30 & mean_atemp_datenums<=CI_datenums(dind)-21);
+    avg_atemp_corr(dind) = nanmean([mean_atemp_vals(ind);NaN]);
+    
+    % solar radiation
+    ind = find(SR_datenums>=CI_datenums(dind)-60 & SR_datenums<=CI_datenums(dind)-30);
+    avg_SR_corr(dind) = nanmean([SR_vals(ind);NaN]);
+    
+    % water level
+    ind = find(WL_datenums>=CI_datenums(dind)-60 & WL_datenums<=CI_datenums(dind)-50);
+    avg_WL_corr(dind) = nanmean([WL_vals(ind);NaN]);
+    
+    % Average TP from maumee river 
+    ind = find(TP_datenums_maumee>=CI_datenums(dind)-30 & TP_datenums_maumee<=CI_datenums(dind)-1);
+    avg_TP_maumee_30(dind) = nanmean(TP_maumee(ind));
+    
+    % Average TP from raisin river
+    ind = find(TP_datenums_raisin>=CI_datenums(dind)-30 & TP_datenums_raisin<=CI_datenums(dind)-1);
+    avg_TP_raisin_30(dind) = nanmean(TP_raisin(ind));
+    
+    % Average TKN from maumee river
+    ind = find(TKN_datenums_maumee>=CI_datenums(dind)-30 & TKN_datenums_maumee<=CI_datenums(dind)-1);
+    avg_TKN_maumee_30(dind) = nanmean(TKN_maumee(ind));
+    
+    % Average TKN from raisin river
+    ind = find(TKN_datenums_raisin>=CI_datenums(dind)-30 & TKN_datenums_raisin<=CI_datenums(dind)-1);
+    avg_TKN_raisin_30(dind) = nanmean(TKN_raisin(ind));
+    
+end
+data = [data,max_atemp_corr',min_atemp_corr',avg_atemp_corr',avg_SR_corr',avg_WL_corr',avg_TP_maumee_30',avg_TP_raisin_30',avg_TKN_maumee_30',avg_TKN_raisin_30'];
+
+%% Add two time-step lag CI values to dataset
+data = [data,NaN*ones(size(data,1),1)];     
+
+for dind = 3:size(data,1)
+    
+    datenum_tmp = data(dind,1);
+    if datenum_tmp - data(dind-2,1)==20
+        data(dind,74) = data(dind-2,2);
+    end
+    
+end
+
 %% save data to a textfile
 
-fname = 'model_data.txt';
+fname = 'model_data_10_corr_CI_lag_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
-fprintf(fid,[repmat('%s\t',1,63),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
+fprintf(fid,[repmat('%s\t',1,72),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
     'min_air_temperature(t)(\circC)','avg_air_temperature(t)(\circC)','max_air_temperature(t)(\circC)',...
     'avg_TP_maumee(t)(Kg/day)','avg_TP_raisin(t)(Kg/day)','avg_TP_sandusky(t)(Kg/day)','avg_TP_cuyahoga(t)(Kg/day)',...
     'avg_TKN_maumee(t)(Kg/day)','avg_TKN_raisin(t)(Kg/day)','avg_TKN_sandusky(t)(Kg/day)','avg_TKN_cuyahoga(t)(Kg/day)',...
@@ -621,17 +676,20 @@ fprintf(fid,[repmat('%s\t',1,63),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)
     'avg_solar_radiation(t-1)(W/m2)','avg_water_level(t-1)(m)','secchi_depth(t-1)(m)',...
     'spring_TP_maumee(Kg/day)','spring_TP_raisin(Kg/day)','spring_TP_sandusky(Kg/day)','spring_TP_cuyahoga(Kg/day)',...
     'spring_TKN_maumee(Kg/day)','spring_TKN_raisin(Kg/day)','spring_TKN_sandusky(Kg/day)','spring_TKN_cuyahoga(Kg/day)',...
-    'Legacy_TP_maumee(Kg/day)','Legacy_TP_raisin(Kg/day)','Legacy_TP_sandusky(Kg/day)','Legacy_TP_cuyahoga(Kg/day)');
+    'Legacy_TP_maumee(Kg/day)','Legacy_TP_raisin(Kg/day)','Legacy_TP_sandusky(Kg/day)','Legacy_TP_cuyahoga(Kg/day)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
+    'avg_atemp_lag_3(\circC)','solar_radiation_30_lag_3(W/m^2)','avg_water_level_lag_6(m)','avg_TP_maumee_30(Kg/day)','avg_TP_raisin_30(Kg/day)',...
+    'avg_TKN_maumee_30(Kg/day)','avg_TKN_raisin_30(Kg/day)','CI(t-2)');
 
 for dind = 1:size(data,1)
     
-    fprintf(fid,['%s\t',repmat('%f\t',1,62),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
+    fprintf(fid,['%s\t',repmat('%f\t',1,72),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
     
 end
 fclose(fid);
 %}
 
 %% arrange time-integrated data into a matrix and write to a textfile
+%{
 data = [CI_vals,avg_TP_maumee_30',avg_TP_maumee_40',avg_TP_maumee_50',avg_TP_maumee_60',avg_TP_raisin_30',avg_TP_raisin_40',avg_TP_raisin_50',...
     avg_TP_raisin_60',avg_TP_sandusky_30',avg_TP_sandusky_40',avg_TP_sandusky_50',avg_TP_sandusky_60',avg_TP_cuyahoga_30',avg_TP_cuyahoga_40',...
     avg_TP_cuyahoga_50',avg_TP_cuyahoga_60',avg_TKN_maumee_30',avg_TKN_maumee_40',avg_TKN_maumee_50',avg_TKN_maumee_60',avg_TKN_raisin_30',...
@@ -660,3 +718,4 @@ for data_ind = 1:size(data,1)
     
 end
 fclose(fid);
+%}
