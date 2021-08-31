@@ -371,8 +371,8 @@ end
 for dind = 1:length(CI_datenums)
     
     % total TP load
-    begin_datenum = CI_datenums(dind)-120;
-    end_datenum = CI_datenums(dind)-1;
+    begin_datenum = CI_datenums(dind)-130;
+    end_datenum = CI_datenums(dind)-11;
     
     % from maumee river
     ind1 = find(TP_datenums_maumee>=begin_datenum & TP_datenums_maumee<=end_datenum);
@@ -611,11 +611,11 @@ data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_at
 data = sortrows(data);                      % arrange the data in increasing order of dates
 data = [data,NaN*ones(size(data,1),26)];     
 
-for dind = 2:size(data,1)
+for dind = 3:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-1,1)==10
-        data(dind,28:end) = data(dind-1,2:27);
+    if datenum_tmp - data(dind-2,1)==20
+        data(dind,28:end) = data(dind-2,2:27);
     end
     
 end
@@ -704,7 +704,7 @@ end
 data = [data,time_step'];
 %% save data to a textfile
 
-fname = 'model_data_10_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
+fname = 'model_data_20_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
 fprintf(fid,[repmat('%s\t',1,82),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
