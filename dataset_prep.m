@@ -317,7 +317,8 @@ for dind = 1:length(CI_datenums)
     
     %% average Secchi depth 10 days
     ind = find(sd_datenums>=CI_datenums(dind) & sd_datenums<=CI_datenums(dind)+9);
-    avg_sd(dind) = nanmean(sd_vals(ind));
+    avg_sd(dind) = nanmean(sd_vals(ind));   
+    
 end
 TN_TP_ratio_maumee = avg_TKN_maumee./avg_TP_maumee;
 TN_TP_ratio_raisin = avg_TKN_raisin./avg_TP_raisin;
@@ -325,6 +326,7 @@ TN_TP_ratio_sandusky = avg_TKN_sandusky./avg_TP_sandusky;
 TN_TP_ratio_cuyahoga = avg_TKN_sandusky./avg_TP_cuyahoga;
 
 %% compute spring TP and TKN
+%
 years = {'2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2016','2017','2018','2019'};
 years_datenum = cellfun(@(x)datenum(x,'yyyy'),years);
 
@@ -360,6 +362,41 @@ for year_ind = 1:length(years_datenum)
     tot_TP_cuyahoga(year_ind) = sum(TP_cuyahoga(ind1));
     ind1 = find(TKN_datenums_cuyahoga>=begin_datenum & TKN_datenums_cuyahoga<=end_datenum);
     tot_TKN_cuyahoga(year_ind) = sum(TKN_cuyahoga(ind1));
+    
+end
+%}
+
+%% compute TP and TKN within last 120 days
+%
+for dind = 1:length(CI_datenums)
+    
+    % total TP load
+    begin_datenum = CI_datenums(dind)-120;
+    end_datenum = CI_datenums(dind)-1;
+    
+    % from maumee river
+    ind1 = find(TP_datenums_maumee>=begin_datenum & TP_datenums_maumee<=end_datenum);
+    tot_TP_120_maumee(dind) = sum(TP_maumee(ind1));
+    ind1 = find(TKN_datenums_maumee>=begin_datenum & TKN_datenums_maumee<=end_datenum);
+    tot_TKN_120_maumee(dind) = sum(TKN_maumee(ind1));
+    
+    % from raisin river
+    ind1 = find(TP_datenums_raisin>=begin_datenum & TP_datenums_raisin<=end_datenum);
+    tot_TP_120_raisin(dind) = sum(TP_raisin(ind1));
+    ind1 = find(TKN_datenums_raisin>=begin_datenum & TKN_datenums_raisin<=end_datenum);
+    tot_TKN_120_raisin(dind) = sum(TKN_raisin(ind1));
+    
+    % from sandusky river
+    ind1 = find(TP_datenums_sandusky>=begin_datenum & TP_datenums_sandusky<=end_datenum);
+    tot_TP_120_sandusky(dind) = sum(TP_sandusky(ind1));
+    ind1 = find(TKN_datenums_sandusky>=begin_datenum & TKN_datenums_sandusky<=end_datenum);
+    tot_TKN_120_sandusky(dind) = sum(TKN_sandusky(ind1));
+    
+    % from cuyahoga river
+    ind1 = find(TP_datenums_cuyahoga>=begin_datenum & TP_datenums_cuyahoga<=end_datenum);
+    tot_TP_120_cuyahoga(dind) = sum(TP_cuyahoga(ind1));
+    ind1 = find(TKN_datenums_cuyahoga>=begin_datenum & TKN_datenums_cuyahoga<=end_datenum);
+    tot_TKN_120_cuyahoga(dind) = sum(TKN_cuyahoga(ind1));
     
 end
 
@@ -655,12 +692,22 @@ for dind = 3:size(data,1)
     
 end
 
+%% add previous 120 days total TP and TKN to dataset
+data = [data,tot_TP_120_maumee',tot_TP_120_raisin',tot_TP_120_sandusky',tot_TP_120_cuyahoga',tot_TKN_120_maumee',tot_TKN_120_raisin',tot_TKN_120_sandusky',tot_TKN_120_cuyahoga'];
+
+%% Corresponding time-step of the year (1 may to 10 may is 1st time-step, 11th may to 20th may is second time-step etc)
+for dind = 1:length(CI_datenums)
+    year = datestr(CI_datenums(dind),'yyyy');
+    first_datenum = datenum(['01-May-',year],'dd-mmm-yyyy');
+    time_step(dind) = (CI_datenums(dind)-first_datenum)/10+1;
+end
+data = [data,time_step'];
 %% save data to a textfile
 
-fname = 'model_data_10_corr_CI_lag_included.txt';
+fname = 'model_data_10_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
-fprintf(fid,[repmat('%s\t',1,72),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
+fprintf(fid,[repmat('%s\t',1,82),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
     'min_air_temperature(t)(\circC)','avg_air_temperature(t)(\circC)','max_air_temperature(t)(\circC)',...
     'avg_TP_maumee(t)(Kg/day)','avg_TP_raisin(t)(Kg/day)','avg_TP_sandusky(t)(Kg/day)','avg_TP_cuyahoga(t)(Kg/day)',...
     'avg_TKN_maumee(t)(Kg/day)','avg_TKN_raisin(t)(Kg/day)','avg_TKN_sandusky(t)(Kg/day)','avg_TKN_cuyahoga(t)(Kg/day)',...
@@ -674,15 +721,16 @@ fprintf(fid,[repmat('%s\t',1,72),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)
     'average_streamflow_maumee(t-1)(cms)','average_streamflow_raisin(t-1)(cms)','average_streamflow_sandusky(t-1)(cms)','average_streamflow_cuyahoga(t-1)(cms)',...
     'TP_TKN_ratio_maumee(t-1)','TP_TKN_ratio_raisin(t-1)','TP_TKN_ratio_sandusky(t-1)','TP_TKN_ratio_cuyahoga(t-1)',...
     'avg_solar_radiation(t-1)(W/m2)','avg_water_level(t-1)(m)','secchi_depth(t-1)(m)',...
-    'spring_TP_maumee(Kg/day)','spring_TP_raisin(Kg/day)','spring_TP_sandusky(Kg/day)','spring_TP_cuyahoga(Kg/day)',...
-    'spring_TKN_maumee(Kg/day)','spring_TKN_raisin(Kg/day)','spring_TKN_sandusky(Kg/day)','spring_TKN_cuyahoga(Kg/day)',...
-    'Legacy_TP_maumee(Kg/day)','Legacy_TP_raisin(Kg/day)','Legacy_TP_sandusky(Kg/day)','Legacy_TP_cuyahoga(Kg/day)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
+    'spring_TP_maumee(Kg)','spring_TP_raisin(Kg)','spring_TP_sandusky(Kg)','spring_TP_cuyahoga(Kg)',...
+    'spring_TKN_maumee(Kg)','spring_TKN_raisin(Kg)','spring_TKN_sandusky(Kg)','spring_TKN_cuyahoga(Kg)',...
+    'Legacy_TP_maumee(Kg)','Legacy_TP_raisin(Kg)','Legacy_TP_sandusky(Kg)','Legacy_TP_cuyahoga(Kg)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
     'avg_atemp_lag_3(\circC)','solar_radiation_30_lag_3(W/m^2)','avg_water_level_lag_6(m)','avg_TP_maumee_30(Kg/day)','avg_TP_raisin_30(Kg/day)',...
-    'avg_TKN_maumee_30(Kg/day)','avg_TKN_raisin_30(Kg/day)','CI(t-2)');
+    'avg_TKN_maumee_30(Kg/day)','avg_TKN_raisin_30(Kg/day)','CI(t-2)','tot_TP_120_maumee(Kg)','tot_TP_120_raisin(Kg)','tot_TP_120_sandusky(Kg)','tot_TP_120_cuyahoga(Kg)',...
+    'tot_TKN_120_maumee(Kg)','tot_TKN_120_raisin(Kg)','tot_TKN_120_sandusky(Kg)','tot_TKN_120_cuyahoga(Kg)','time_step_of_the_year');
 
 for dind = 1:size(data,1)
     
-    fprintf(fid,['%s\t',repmat('%f\t',1,72),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
+    fprintf(fid,['%s\t',repmat('%f\t',1,81),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
     
 end
 fclose(fid);
