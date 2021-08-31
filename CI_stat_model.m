@@ -5,10 +5,10 @@ close all
 clc
 
 % read data
-fname = 'model_data_10.txt';
+fname = 'model_data_10_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
-formatspec = ['%s',repmat('%f',1,63)];
+formatspec = ['%s',repmat('%f',1,82)];
 data = textscan(fid,formatspec,'delimiter','\t','headerlines',1);
 fclose(fid);
 
@@ -16,6 +16,9 @@ dates = data{1};
 CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:24) = [];
+preds(:,27:34) = []; % remove spring TP and TKN loads
+preds(:,31:40) = []; % remove correlation-lag variables
+preds(:,end)=[];     % remove time-step of the 10-day time-period window
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
 % preds = [preds,month_num];
@@ -44,7 +47,7 @@ cc_dates(ind)  = [];
 cc(ind) = [];
 
 % remove outliers, zero CI values and missing values
-zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)));
+zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)) | isnan(preds(:,end)) | preds(:,end)==0);
 CI(zero_ind) = [];
 preds(zero_ind,:) = [];
 dates(zero_ind) = [];
@@ -52,7 +55,8 @@ dates(zero_ind) = [];
 % covert CIs into logarithmic scale
 CI = log(CI);
 % preds(:,1) = log(preds(:,1));
-preds(:,2:4) = preds(:,2:4).^2;
+% preds(:,2:4) = preds(:,2:4).^2;
+% preds = [preds(:,1) preds(:,end)];
 
 % normalize the predictor variables
 preds_m = nanmean(preds);
@@ -62,7 +66,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%{
+%
 rng(1);
 
 for count = 1:1000
@@ -81,7 +85,7 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-    %{
+%
     % cross-validation
     NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
@@ -130,20 +134,20 @@ for count = 1:1000
     
     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
-    box('on')
+    box('on');
     box.linewidth = 2;
     set(gca,'fontname','arial','fontsize',12,box)
     
     % save figure
     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/RF_regression_plots_1',fname);
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
     print(filename,'-r300','-djpeg')
     clear box
     
-    %}
+%}
     
     %% linear regression
-    %{
+%{
     mdl=fitlm(preds_cal,CI_cal);
     Fitted_val = predict(mdl,preds_val);
     
@@ -153,10 +157,10 @@ for count = 1:1000
     plot([0 10],[0 10],'color','black')
     
     R21=corr(CI_val,Fitted_val)^2;
-    %}
+%}
     
     %% lasso regression
-    %{
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -170,26 +174,27 @@ for count = 1:1000
     R21(count) = corr(CI_val,Fitted_val)^2;
     rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
     lambda(count) = Fitinfo.LambdaMinMSE;
-%     R21_tmp = (round(R21(count)*100))/100;
-%     title(['R^2 = ',num2str(R21_tmp)]);
-%     
-%     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
-%     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
-%     box('on')
-%     box.linewidth = 2;
-%     set(gca,'fontname','arial','fontsize',12,box)
-% %     pause(1);
-%     clear box
-%     
-%     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-%     filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-%     print(filename,'-r300','-djpeg')
-%     close all
-    %}
+    
+    R21_tmp = (round(R21(count)*100))/100;
+    title(['R^2 = ',num2str(R21_tmp)]);
+
+    xlabel('Observed log(CI)','fontname','arial','fontsize',12)
+    ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
+    box('on');
+    box.linewidth = 2;
+    set(gca,'fontname','arial','fontsize',12,box)
+%     pause(1);
+    clear box
+
+    fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+    print(filename,'-r300','-djpeg')
+    close all
+%}
     
     %% Gaussian processes
     % divide the entire data into k uniform folds
-    %{
+%{
     k = 1;                                                % number of folds for cross-validation
     c = cvpartition(CI_cal,'holdout',0.5);
     % minimize objective function
@@ -224,55 +229,62 @@ for count = 1:1000
 
 %}
 end
-%{
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-fig2svg(filename);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+saveas(gcf,filename,'svg');
 %
-hist(lambda)
-xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-fname = strcat('lambda_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-fig2svg(filename);
+% hist(lambda)
+% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+% fname = strcat('lambda_histogram.svg');
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
 %
 % for pind = 1:length(pred_name)
-%     
+%
 %     hist(beta(1+pind,:))
 %     xlabel(num2str(pind),'fontname','arial','fontsize',12);
 % end
 
-beta_plot = beta(2:end,:);
-boxplot(beta_plot',1:38);
-ylabel('Regression coefficients','fontname','arial','fontsize',12)
+% beta_plot = beta(2:end,:);
+% boxplot(beta_plot',1:38);
+% ylabel('Regression coefficients','fontname','arial','fontsize',12)
+% set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
+% fname = 'coefficient_distribtuion.svg';
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
+
+boxplot(importance,1:38);
+ylabel('Predictor importance','fontname','arial','fontsize',12)
 set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-fname = 'coefficient_distribtuion.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots/lasso_regression_plots_1',fname);
-fig2svg(filename);
+fname = 'predictor_importance.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+saveas(gcf,filename,'svg');
 %}
 %}
 %% cross-validation (no validation)
-%
+%{
 for CI_ind =  1:length(CI)
-    
+    CI_ind
     val_ind = CI_ind;
     cal_ind = setdiff(1:length(CI),val_ind);
     CI_cal = CI(cal_ind); preds_cal = preds(cal_ind,:);
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-    %
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
-    %}
+%}
     
     %% Random Forest
-    %{
+%
      NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -295,8 +307,8 @@ for CI_ind =  1:length(CI)
     B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
     Fitted_val(CI_ind,1)=predict(B,preds_val);
-    %}
 end
+
 
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
@@ -313,9 +325,15 @@ set(gca,'fontname','arial','fontsize',12,box)
 title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_wind_speed_squared.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
-fig2svg(filename)
+% save plot
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_vars_and_time_steps_predictor_added.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
+saveas(gcf,filename,'svg')
+
+% save data
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_vars_and_time_steps_predictor_added.mat';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
+save(filename);
 %}
 % Uncertainty analysis of residuals
 %{
@@ -355,6 +373,68 @@ clear box
 fname = 'RF_qqplot_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots',fname);
 fig2svg(filename)
+%}
+
+%% regression using important predictor variables
+%{
+% read beta values obtained by LASSO
+fname = 'LASSO_BS_corr_lag_CI_beta_values.mat';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',fname);
+beta_vals = load(filename);
+beta_vals = beta_vals.beta;
+% remove bias term
+beta_vals(1,:) = [];
+
+% compute median of beta values
+beta_M = mean(beta_vals,2);
+beta_M = beta_M/max(beta_M);
+beta_M = abs(beta_M);
+beta_M = [beta_M,[1:48]'];
+beta_M = sortrows(beta_M);
+beta_M = flipud(beta_M);
+
+%{
+for var_ind = 1:size(beta_M,1)
+    preds_tmp = preds(:,beta_M(1:var_ind,2));
+    
+    for CI_ind =  1:length(CI)
+        
+        val_ind = CI_ind;
+        cal_ind = setdiff(1:length(CI),val_ind);
+        CI_cal = CI(cal_ind); preds_cal = preds_tmp(cal_ind,:);
+        CI_val = CI(val_ind); preds_val = preds_tmp(val_ind,:);
+        
+        %% LASSO
+        %
+        [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
+        ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
+        beta = [Fitinfo.Intercept(ind);B(:,ind)];
+        Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
+        %}
+    end
+    mse(var_ind) = mean((CI-Fitted_val).^2);
+    R21(var_ind) = corr(CI,Fitted_val)^2;
+end
+
+% plot mean-square-error 
+plot(mse,'-o','linewidth',1,'color','black','Markeredgecolor','b','Markerfacecolor','b');
+xlabel('Predictor variable','fontname','arial','fontsize',12)
+ylabel('Mean-squared-error','fontname','arial','fontsize',12)
+box('on')
+box.linewidth = 2;
+set(gca,'fontname','arial','fontsize',12,'plotboxaspectratio',[2 1 1],'ylim',[min(mse)-0.001 max(mse)+0.001],box)
+clear box
+
+% save plot
+sname = 'mse_predictor_importance.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',sname);
+fig2svg(filename);
+
+% save data
+sname = 'mse_predictor_importance.mat';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',sname);
+save(filename);
+
 %}
 
 
