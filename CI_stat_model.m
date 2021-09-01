@@ -85,7 +85,7 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-%{
+%
     % cross-validation
     NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
@@ -160,7 +160,7 @@ for count = 1:1000
 %}
     
     %% lasso regression
-%
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -234,14 +234,14 @@ hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
 hist(lambda)
 xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('lambda_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
 % for pind = 1:length(pred_name)
@@ -250,20 +250,20 @@ saveas(gcf,filename,'svg');
 %     xlabel(num2str(pind),'fontname','arial','fontsize',12);
 % end
 
-beta_plot = beta(2:end,:);
-boxplot(beta_plot',1:39);
-ylabel('Regression coefficients','fontname','arial','fontsize',12)
-set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-fname = 'coefficient_distribtuion.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
-saveas(gcf,filename,'svg');
-
-% boxplot(importance,1:38);
-% ylabel('Predictor importance','fontname','arial','fontsize',12)
+% beta_plot = beta(2:end,:);
+% boxplot(beta_plot',1:39);
+% ylabel('Regression coefficients','fontname','arial','fontsize',12)
 % set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-% fname = 'predictor_importance.svg';
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+% fname = 'coefficient_distribtuion.svg';
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
 % saveas(gcf,filename,'svg');
+
+boxplot(importance,1:39);
+ylabel('Predictor importance','fontname','arial','fontsize',12)
+set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
+fname = 'predictor_importance.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+saveas(gcf,filename,'svg');
 %}
 %}
 %% cross-validation (no validation)
