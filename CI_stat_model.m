@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data_20_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
+fname = 'model_data_30_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,82)];
@@ -237,12 +237,12 @@ fname = strcat('R2_histogram.svg');
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
-hist(lambda)
-xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-fname = strcat('lambda_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
-saveas(gcf,filename,'svg');
+% hist(lambda)
+% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+% fname = strcat('lambda_histogram.svg');
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
 %
 % for pind = 1:length(pred_name)
 %
