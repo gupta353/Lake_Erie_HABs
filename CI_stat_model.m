@@ -251,7 +251,7 @@ saveas(gcf,filename,'svg');
 % end
 
 beta_plot = beta(2:end,:);
-boxplot(beta_plot',1:38);
+boxplot(beta_plot',1:39);
 ylabel('Regression coefficients','fontname','arial','fontsize',12)
 set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
 fname = 'coefficient_distribtuion.svg';
