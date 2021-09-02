@@ -17,7 +17,7 @@ CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:24) = [];
 preds(:,27:34) = []; % remove spring TP and TKN loads
-preds(:,31:40) = []; % remove correlation-lag variables
+% preds(:,31:40) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
@@ -328,12 +328,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.svg';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_and_time_steps_predictor_added.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.mat';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_and_time_steps_predictor_added.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 save(filename);
 %}
