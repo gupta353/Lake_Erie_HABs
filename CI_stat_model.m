@@ -18,7 +18,7 @@ preds = cat(2,data{3:end});
 preds(:,1:24) = [];
 preds(:,27:34) = []; % remove spring TP and TKN loads
 preds(:,31:40) = []; % remove correlation-lag variables
-% preds(:,end)=[];     % remove time-step of the 10-day time-period window
+preds(:,end)=[];     % remove time-step of the 10-day time-period window
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
 % preds = [preds,month_num];
@@ -66,7 +66,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
 for count = 1:1000
@@ -228,8 +228,8 @@ for count = 1:1000
     
 end
 %}
-end
-%
+
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -241,7 +241,7 @@ hist(lambda)
 xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('lambda_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
 % for pind = 1:length(pred_name)
@@ -267,7 +267,7 @@ saveas(gcf,filename,'svg');
 %}
 %}
 %% cross-validation (no validation)
-%{
+%
 for CI_ind =  1:length(CI)
     CI_ind
     val_ind = CI_ind;
@@ -310,7 +310,8 @@ for CI_ind =  1:length(CI)
 
 %
 end
-
+%}
+end
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
 xlim([2 6.5])
@@ -327,12 +328,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_corr_lag_vars_and_removed_time_steps_predictor_added.svg';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_corr_lag_vars_and_removed_time_steps_predictor_added.mat';
+fname = 'lasso_obs_pred_log_CI_cross_validation_cc10_removed.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 save(filename);
 %}
