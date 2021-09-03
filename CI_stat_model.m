@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data_30_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
+fname = 'model_data_10_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,82)];
@@ -17,7 +17,7 @@ CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:24) = [];
 preds(:,27:34) = []; % remove spring TP and TKN loads
-% preds(:,31:40) = []; % remove correlation-lag variables
+preds(:,31:40) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
@@ -66,7 +66,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%{
+%
 rng(1);
 
 for count = 1:1000
@@ -228,8 +228,8 @@ for count = 1:1000
     
 end
 %}
-
-%{
+end
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -328,12 +328,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_and_time_steps_predictor_added.svg';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_corr_lag_and_time_steps_predictor_added.mat';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
 save(filename);
 %}
