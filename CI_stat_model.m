@@ -17,7 +17,7 @@ CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:24) = [];
 preds(:,27:34) = []; % remove spring TP and TKN loads
-preds(:,31:40) = []; % remove correlation-lag variables
+% preds(:,31:40) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
 month_num = cellfun(wrapper,dates);
@@ -85,7 +85,7 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-%
+%{
     % cross-validation
     NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
@@ -160,7 +160,7 @@ for count = 1:1000
 %}
     
     %% lasso regression
-%{
+%
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -187,7 +187,7 @@ for count = 1:1000
     clear box
 
     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
     print(filename,'-r300','-djpeg')
     close all
 %}
@@ -229,7 +229,7 @@ for count = 1:1000
 end
 %}
 end
-%
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -311,7 +311,7 @@ for CI_ind =  1:length(CI)
 %
 end
 %}
-
+%{
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
 xlim([2 6.5])
@@ -381,7 +381,7 @@ fig2svg(filename)
 %{
 % read beta values obtained by LASSO
 fname = 'LASSO_BS_corr_lag_CI_beta_values.mat';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_ahead_of_time',fname);
 beta_vals = load(filename);
 beta_vals = beta_vals.beta;
 % remove bias term
