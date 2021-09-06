@@ -47,7 +47,7 @@ cc_dates(ind)  = [];
 cc(ind) = [];
 
 % remove outliers, zero CI values and missing values
-zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)) | isnan(preds(:,end)) | preds(:,end)==0);
+zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)) | isnan(preds(:,40)) | isnan(preds(:,end)) | preds(:,end)==0);
 CI(zero_ind) = [];
 preds(zero_ind,:) = [];
 dates(zero_ind) = [];
@@ -191,7 +191,7 @@ for count = 1:1000
     print(filename,'-r300','-djpeg')
     close all
 %}
-    
+end
     %% Gaussian processes
     % divide the entire data into k uniform folds
 %{
@@ -228,21 +228,21 @@ for count = 1:1000
     
 end
 %}
-end
-%{
+
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
 saveas(gcf,filename,'svg');
 %
-% hist(lambda)
-% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-% fname = strcat('lambda_histogram.svg');
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
-% saveas(gcf,filename,'svg');
+hist(lambda)
+xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+fname = strcat('lambda_histogram.svg');
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
+saveas(gcf,filename,'svg');
 % %
 % for pind = 1:length(pred_name)
 %
@@ -250,20 +250,20 @@ saveas(gcf,filename,'svg');
 %     xlabel(num2str(pind),'fontname','arial','fontsize',12);
 % end
 
-% beta_plot = beta(2:end,:);
-% boxplot(beta_plot',1:39);
-% ylabel('Regression coefficients','fontname','arial','fontsize',12)
-% set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-% fname = 'coefficient_distribtuion.svg';
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS',fname);
-% saveas(gcf,filename,'svg');
-
-boxplot(importance,1:39);
-ylabel('Predictor importance','fontname','arial','fontsize',12)
+beta_plot = beta(2:end,:);
+boxplot(beta_plot',1:49);
+ylabel('Regression coefficients','fontname','arial','fontsize',12)
 set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-fname = 'predictor_importance.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+fname = 'coefficient_distribtuion.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
 saveas(gcf,filename,'svg');
+ 
+% boxplot(importance,1:39);
+% ylabel('Predictor importance','fontname','arial','fontsize',12)
+% set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
+% fname = 'predictor_importance.svg';
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
 %}
 %}
 %% cross-validation (no validation)
@@ -381,7 +381,7 @@ fig2svg(filename)
 %{
 % read beta values obtained by LASSO
 fname = 'LASSO_BS_corr_lag_CI_beta_values.mat';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_ahead_of_time',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',fname);
 beta_vals = load(filename);
 beta_vals = beta_vals.beta;
 % remove bias term
@@ -391,7 +391,7 @@ beta_vals(1,:) = [];
 beta_M = mean(beta_vals,2);
 beta_M = beta_M/max(beta_M);
 beta_M = abs(beta_M);
-beta_M = [beta_M,[1:48]'];
+beta_M = [beta_M,[1:49]'];
 beta_M = sortrows(beta_M);
 beta_M = flipud(beta_M);
 
@@ -429,12 +429,12 @@ clear box
 
 % save plot
 sname = 'mse_predictor_importance.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',sname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',sname);
 fig2svg(filename);
 
 % save data
 sname = 'mse_predictor_importance.mat';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots','10_days_ahead_of_time',sname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',sname);
 save(filename);
 
 %}
