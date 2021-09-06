@@ -66,7 +66,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
 for count = 1:1000
@@ -191,7 +191,7 @@ for count = 1:1000
     print(filename,'-r300','-djpeg')
     close all
 %}
-end
+
     %% Gaussian processes
     % divide the entire data into k uniform folds
 %{
@@ -229,7 +229,7 @@ end
 end
 %}
 
-%
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -378,7 +378,7 @@ fig2svg(filename)
 %}
 
 %% regression using important predictor variables
-%{
+%
 % read beta values obtained by LASSO
 fname = 'LASSO_BS_corr_lag_CI_beta_values.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',fname);
@@ -395,7 +395,7 @@ beta_M = [beta_M,[1:49]'];
 beta_M = sortrows(beta_M);
 beta_M = flipud(beta_M);
 
-%{
+%
 for var_ind = 1:size(beta_M,1)
     preds_tmp = preds(:,beta_M(1:var_ind,2));
     
