@@ -114,7 +114,7 @@ TP_datenums_cuyahoga = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TP_dates);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% read total Nitrogen data from maumee river
+% read total Kjeldahl Nitrogen data from maumee river
 fname = 'maumee_reconstructed_TKN_conc.txt';
 filename = fullfile(direc,'HTLP_updated',fname);
 fid = fopen(filename,'r');
@@ -153,6 +153,131 @@ fclose(fid);
 TKN_dates = data{1};
 TKN_cuyahoga = data{4};
 TKN_datenums_cuyahoga = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TP_dates);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% read NO23 (nitrate + nitrite) data from maumee river
+fname = 'maumee_reconstructed_NO23_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+NO23_dates = data{1};
+NO23_maumee = data{4};
+NO23_datenums_maumee = cellfun(@(x)datenum(x,'mm/dd/yyyy'),NO23_dates);
+
+% read NO23 (nitrate + nitrite) data from raisin river
+fname = 'raisin_reconstructed_NO23_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+NO23_dates = data{1};
+NO23_raisin = data{4};
+NO23_datenums_raisin = cellfun(@(x)datenum(x,'mm/dd/yyyy'),NO23_dates);
+
+% read NO23 (nitrate + nitrite) data from sandusky river
+fname = 'sandusky_reconstructed_NO23_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+NO23_dates = data{1};
+NO23_sandusky = data{4};
+NO23_datenums_sandusky = cellfun(@(x)datenum(x,'mm/dd/yyyy'),NO23_dates);
+
+% read NO23 (nitrate + nitrite) data from sandusky river
+fname = 'cuyahoga_reconstructed_NO23_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+NO23_dates = data{1};
+NO23_cuyahoga = data{4};
+NO23_datenums_cuyahoga = cellfun(@(x)datenum(x,'mm/dd/yyyy'),NO23_dates);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% read SRP data from maumee river
+fname = 'maumee_reconstructed_SRP_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+SRP_dates = data{1};
+SRP_maumee = data{4};
+SRP_datenums_maumee = cellfun(@(x)datenum(x,'mm/dd/yyyy'),SRP_dates);
+
+% read SRP data from raisin river
+fname = 'raisin_reconstructed_SRP_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+SRP_dates = data{1};
+SRP_raisin = data{4};
+SRP_datenums_raisin = cellfun(@(x)datenum(x,'mm/dd/yyyy'),SRP_dates);
+
+% read SRP data from sandusky river
+fname = 'sandusky_reconstructed_SRP_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+SRP_dates = data{1};
+SRP_sandusky = data{4};
+SRP_datenums_sandusky = cellfun(@(x)datenum(x,'mm/dd/yyyy'),SRP_dates);
+
+% read SRP data from cuyahoga river river
+fname = 'cuyahoga_reconstructed_SRP_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+SRP_dates = data{1};
+SRP_cuyahoga = data{4};
+SRP_datenums_cuyahoga = cellfun(@(x)datenum(x,'mm/dd/yyyy'),SRP_dates);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% read TSS data from maumee river
+fname = 'maumee_reconstructed_TSS_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+TSS_dates = data{1};
+TSS_maumee = data{4};
+TSS_datenums_maumee = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TSS_dates);
+
+% read TSS data from raisin river
+fname = 'raisin_reconstructed_TSS_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+TSS_dates = data{1};
+TSS_raisin = data{4};
+TSS_datenums_raisin = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TSS_dates);
+
+% read TSS data from sandusky river
+fname = 'sandusky_reconstructed_TSS_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+TSS_dates = data{1};
+TSS_sandusky = data{4};
+TSS_datenums_sandusky = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TSS_dates);
+
+% read TSS data from cuyahoga river
+fname = 'cuyahoga_reconstructed_TSS_conc.txt';
+filename = fullfile(direc,'HTLP_updated',fname);
+fid = fopen(filename,'r');
+data = textscan(fid,'%s%f%f%f','delimiter','\t','headerlines',1);
+fclose(fid);
+TSS_dates = data{1};
+TSS_cuyahoga = data{4};
+TSS_datenums_cuyahoga = cellfun(@(x)datenum(x,'mm/dd/yyyy'),TSS_dates);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -298,6 +423,57 @@ for dind = 1:length(CI_datenums)
     ind = find(TKN_datenums_cuyahoga>=CI_datenums(dind) & TKN_datenums_cuyahoga<=CI_datenums(dind)+9);
     avg_TKN_cuyahoga(dind) = nanmean(TKN_cuyahoga(ind));
     
+    %% average NO23 within 10 days
+    % from maumee river
+    ind = find(NO23_datenums_maumee>=CI_datenums(dind) & NO23_datenums_maumee<=CI_datenums(dind)+9);
+    avg_NO23_maumee(dind) = nanmean(NO23_maumee(ind));
+    
+    % from raisin river
+    ind = find(NO23_datenums_raisin>=CI_datenums(dind) & NO23_datenums_raisin<=CI_datenums(dind)+9);
+    avg_NO23_raisin(dind) = nanmean(NO23_raisin(ind));
+    
+    % from sandusky river
+    ind = find(NO23_datenums_sandusky>=CI_datenums(dind) & NO23_datenums_sandusky<=CI_datenums(dind)+9);
+    avg_NO23_sandusky(dind) = nanmean(NO23_sandusky(ind));
+    
+    % from cuyahoga river
+    ind = find(NO23_datenums_cuyahoga>=CI_datenums(dind) & NO23_datenums_cuyahoga<=CI_datenums(dind)+9);
+    avg_NO23_cuyahoga(dind) = nanmean(NO23_cuyahoga(ind));
+    
+    %% average SRP within 10 days
+    % from maumee river
+    ind = find(SRP_datenums_maumee>=CI_datenums(dind) & SRP_datenums_maumee<=CI_datenums(dind)+9);
+    avg_SRP_maumee(dind) = nanmean(SRP_maumee(ind));
+    
+    % from raisin river
+    ind = find(SRP_datenums_raisin>=CI_datenums(dind) & SRP_datenums_raisin<=CI_datenums(dind)+9);
+    avg_SRP_raisin(dind) = nanmean(SRP_raisin(ind));
+    
+    % from sandusky river
+    ind = find(SRP_datenums_sandusky>=CI_datenums(dind) & SRP_datenums_sandusky<=CI_datenums(dind)+9);
+    avg_SRP_sandusky(dind) = nanmean(SRP_sandusky(ind));
+    
+    % from cuyahoga river
+    ind = find(SRP_datenums_cuyahoga>=CI_datenums(dind) & SRP_datenums_cuyahoga<=CI_datenums(dind)+9);
+    avg_SRP_cuyahoga(dind) = nanmean(SRP_cuyahoga(ind));
+    
+    %% average TSS within 10 days
+    % from maumee river
+    ind = find(TSS_datenums_maumee>=CI_datenums(dind) & TSS_datenums_maumee<=CI_datenums(dind)+9);
+    avg_TSS_maumee(dind) = nanmean(TSS_maumee(ind));
+    
+    % from raisin river
+    ind = find(TSS_datenums_raisin>=CI_datenums(dind) & TSS_datenums_raisin<=CI_datenums(dind)+9);
+    avg_TSS_raisin(dind) = nanmean(TSS_raisin(ind));
+    
+    % from sandusky river
+    ind = find(TSS_datenums_sandusky>=CI_datenums(dind) & TSS_datenums_sandusky<=CI_datenums(dind)+9);
+    avg_TSS_sandusky(dind) = nanmean(TSS_sandusky(ind));
+    
+    % from cuyahoga river
+    ind = find(TSS_datenums_cuyahoga>=CI_datenums(dind) & TSS_datenums_cuyahoga<=CI_datenums(dind)+9);
+    avg_TSS_cuyahoga(dind) = nanmean(TSS_cuyahoga(ind));
+    
     %% total streamflow within 10 days
     % from maumee river
     ind = find(strm_datenums_maumee>=CI_datenums(dind) & strm_datenums_maumee<=CI_datenums(dind)+9);
@@ -320,10 +496,18 @@ for dind = 1:length(CI_datenums)
     avg_sd(dind) = nanmean(sd_vals(ind));   
     
 end
+
+% ratio of TP to TKN
 TN_TP_ratio_maumee = avg_TKN_maumee./avg_TP_maumee;
 TN_TP_ratio_raisin = avg_TKN_raisin./avg_TP_raisin;
 TN_TP_ratio_sandusky = avg_TKN_sandusky./avg_TP_sandusky;
 TN_TP_ratio_cuyahoga = avg_TKN_sandusky./avg_TP_cuyahoga;
+
+% ratio of TKN to NO23
+TN_NO23_ratio_maumee = avg_TKN_maumee./avg_NO23_maumee;
+TN_NO23_ratio_raisin = avg_TKN_raisin./avg_NO23_raisin;
+TN_NO23_ratio_sandusky = avg_TKN_sandusky./avg_NO23_sandusky;
+TN_NO23_ratio_cuyahoga = avg_TKN_sandusky./avg_NO23_cuyahoga;
 
 %% compute spring TP and TKN
 %
@@ -366,11 +550,10 @@ for year_ind = 1:length(years_datenum)
 end
 %}
 
-%% compute TP and TKN within last 120 days
+%% compute TP, TKN, NO23, SRP, and TSS within last 120 days
 %
 for dind = 1:length(CI_datenums)
     
-    % total TP load
     begin_datenum = CI_datenums(dind)-140;
     end_datenum = CI_datenums(dind)-21;
     
@@ -379,24 +562,48 @@ for dind = 1:length(CI_datenums)
     tot_TP_120_maumee(dind) = sum(TP_maumee(ind1));
     ind1 = find(TKN_datenums_maumee>=begin_datenum & TKN_datenums_maumee<=end_datenum);
     tot_TKN_120_maumee(dind) = sum(TKN_maumee(ind1));
+    ind1 = find(NO23_datenums_maumee>=begin_datenum & NO23_datenums_maumee<=end_datenum);
+    tot_NO23_120_maumee(dind) = sum(NO23_maumee(ind1));
+    ind1 = find(SRP_datenums_maumee>=begin_datenum & SRP_datenums_maumee<=end_datenum);
+    tot_SRP_120_maumee(dind) = sum(SRP_maumee(ind1));
+    ind1 = find(TSS_datenums_maumee>=begin_datenum & TSS_datenums_maumee<=end_datenum);
+    tot_TSS_120_maumee(dind) = sum(TSS_maumee(ind1));
     
     % from raisin river
     ind1 = find(TP_datenums_raisin>=begin_datenum & TP_datenums_raisin<=end_datenum);
     tot_TP_120_raisin(dind) = sum(TP_raisin(ind1));
     ind1 = find(TKN_datenums_raisin>=begin_datenum & TKN_datenums_raisin<=end_datenum);
     tot_TKN_120_raisin(dind) = sum(TKN_raisin(ind1));
+    ind1 = find(NO23_datenums_raisin>=begin_datenum & NO23_datenums_raisin<=end_datenum);
+    tot_NO23_120_raisin(dind) = sum(NO23_raisin(ind1));
+    ind1 = find(SRP_datenums_raisin>=begin_datenum & SRP_datenums_raisin<=end_datenum);
+    tot_SRP_120_raisin(dind) = sum(SRP_raisin(ind1));
+    ind1 = find(TSS_datenums_raisin>=begin_datenum & TSS_datenums_raisin<=end_datenum);
+    tot_TSS_120_raisin(dind) = sum(TSS_raisin(ind1));
     
     % from sandusky river
     ind1 = find(TP_datenums_sandusky>=begin_datenum & TP_datenums_sandusky<=end_datenum);
     tot_TP_120_sandusky(dind) = sum(TP_sandusky(ind1));
     ind1 = find(TKN_datenums_sandusky>=begin_datenum & TKN_datenums_sandusky<=end_datenum);
     tot_TKN_120_sandusky(dind) = sum(TKN_sandusky(ind1));
+    ind1 = find(NO23_datenums_sandusky>=begin_datenum & NO23_datenums_sandusky<=end_datenum);
+    tot_NO23_120_sandusky(dind) = sum(NO23_sandusky(ind1));
+    ind1 = find(SRP_datenums_sandusky>=begin_datenum & SRP_datenums_sandusky<=end_datenum);
+    tot_SRP_120_sandusky(dind) = sum(SRP_sandusky(ind1));
+    ind1 = find(TSS_datenums_sandusky>=begin_datenum & TSS_datenums_sandusky<=end_datenum);
+    tot_TSS_120_sandusky(dind) = sum(TSS_sandusky(ind1));
     
     % from cuyahoga river
     ind1 = find(TP_datenums_cuyahoga>=begin_datenum & TP_datenums_cuyahoga<=end_datenum);
     tot_TP_120_cuyahoga(dind) = sum(TP_cuyahoga(ind1));
     ind1 = find(TKN_datenums_cuyahoga>=begin_datenum & TKN_datenums_cuyahoga<=end_datenum);
     tot_TKN_120_cuyahoga(dind) = sum(TKN_cuyahoga(ind1));
+    ind1 = find(NO23_datenums_cuyahoga>=begin_datenum & NO23_datenums_cuyahoga<=end_datenum);
+    tot_NO23_120_cuyahoga(dind) = sum(NO23_cuyahoga(ind1));
+    ind1 = find(SRP_datenums_cuyahoga>=begin_datenum & SRP_datenums_cuyahoga<=end_datenum);
+    tot_SRP_120_cuyahoga(dind) = sum(SRP_cuyahoga(ind1));
+    ind1 = find(TSS_datenums_cuyahoga>=begin_datenum & TSS_datenums_cuyahoga<=end_datenum);
+    tot_TSS_120_cuyahoga(dind) = sum(TSS_cuyahoga(ind1));
     
 end
 
@@ -436,7 +643,7 @@ for year_ind = 1:length(years_datenum)
 end
 
 %% compute TP, TKN and streamflow integrated in time within last 20,30,40,50,and 60 days
-%{
+%
 for dind = 1:length(CI_datenums)
     
     %% average TP within last 20,30, 40,50,and 60 days
@@ -492,7 +699,9 @@ for dind = 1:length(CI_datenums)
     ind = find(TP_datenums_cuyahoga<CI_datenums(dind) & TP_datenums_cuyahoga>=CI_datenums(dind)-60);
     avg_TP_cuyahoga_60(dind) = nanmean(TP_cuyahoga(ind));
     
-     %% average TKN within last 20,30, 40,50,and 60 days
+    
+    
+     %% average TKN within last 20,30, 40,50,and 60 days (Infs are replaced by zeros, becuase infs occured at missing values during reconstruction when nearby data were zeros)
     % from maumee river
     ind = find(TKN_datenums_maumee<CI_datenums(dind) & TKN_datenums_maumee>=CI_datenums(dind)-30);
     avg_TKN_maumee_30(dind) = nanmean(TKN_maumee(ind));
@@ -544,6 +753,271 @@ for dind = 1:length(CI_datenums)
     
     ind = find(TKN_datenums_cuyahoga<CI_datenums(dind) & TKN_datenums_cuyahoga>=CI_datenums(dind)-60);
     avg_TKN_cuyahoga_60(dind) = nanmean(TKN_cuyahoga(ind));
+    
+    
+    
+    %% average NO23 within last 20,30, 40,50,and 60 days
+    % from maumee river
+    ind = find(NO23_datenums_maumee<CI_datenums(dind) & NO23_datenums_maumee>=CI_datenums(dind)-30);
+    tmp = NO23_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_maumee_30(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_maumee<CI_datenums(dind) & NO23_datenums_maumee>=CI_datenums(dind)-40);
+    tmp = NO23_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_maumee_40(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_maumee<CI_datenums(dind) & NO23_datenums_maumee>=CI_datenums(dind)-50);
+    tmp = NO23_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_maumee_50(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_maumee<CI_datenums(dind) & NO23_datenums_maumee>=CI_datenums(dind)-60);
+    tmp = NO23_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_maumee_60(dind) = nanmean(tmp);
+    
+    % from raisin river
+    ind = find(NO23_datenums_raisin<CI_datenums(dind) & NO23_datenums_raisin>=CI_datenums(dind)-30);
+    tmp = NO23_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_raisin_30(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_raisin<CI_datenums(dind) & NO23_datenums_raisin>=CI_datenums(dind)-40);
+    tmp = NO23_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_raisin_40(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_raisin<CI_datenums(dind) & NO23_datenums_raisin>=CI_datenums(dind)-50);
+    tmp = NO23_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_raisin_50(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_raisin<CI_datenums(dind) & NO23_datenums_raisin>=CI_datenums(dind)-60);
+    tmp = NO23_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_raisin_60(dind) = nanmean(tmp);
+    
+    % from sandusky river
+    ind = find(NO23_datenums_sandusky<CI_datenums(dind) & NO23_datenums_sandusky>=CI_datenums(dind)-30);
+    tmp = NO23_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_sandusky_30(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_sandusky<CI_datenums(dind) & NO23_datenums_sandusky>=CI_datenums(dind)-40);
+    tmp = NO23_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_sandusky_40(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_sandusky<CI_datenums(dind) & NO23_datenums_sandusky>=CI_datenums(dind)-50);
+    tmp = NO23_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_sandusky_50(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_sandusky<CI_datenums(dind) & NO23_datenums_sandusky>=CI_datenums(dind)-60);
+    tmp = NO23_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_sandusky_60(dind) = nanmean(tmp);
+    
+    % from cuyahoga river
+    ind = find(NO23_datenums_cuyahoga<CI_datenums(dind) & NO23_datenums_cuyahoga>=CI_datenums(dind)-30);
+    tmp = NO23_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_cuyahoga_30(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_cuyahoga<CI_datenums(dind) & NO23_datenums_cuyahoga>=CI_datenums(dind)-40);
+    tmp = NO23_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_cuyahoga_40(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_cuyahoga<CI_datenums(dind) & NO23_datenums_cuyahoga>=CI_datenums(dind)-50);
+    tmp = NO23_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_cuyahoga_50(dind) = nanmean(tmp);
+    
+    ind = find(NO23_datenums_cuyahoga<CI_datenums(dind) & NO23_datenums_cuyahoga>=CI_datenums(dind)-60);
+    tmp = NO23_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_NO23_cuyahoga_60(dind) = nanmean(tmp);
+    
+    
+    
+    %% average SRP within last 20,30, 40,50,and 60 days
+    % from maumee river
+    ind = find(SRP_datenums_maumee<CI_datenums(dind) & SRP_datenums_maumee>=CI_datenums(dind)-30);
+    tmp = SRP_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_maumee_30(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_maumee<CI_datenums(dind) & SRP_datenums_maumee>=CI_datenums(dind)-40);
+    tmp = SRP_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_maumee_40(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_maumee<CI_datenums(dind) & SRP_datenums_maumee>=CI_datenums(dind)-50);
+    tmp = SRP_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_maumee_50(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_maumee<CI_datenums(dind) & SRP_datenums_maumee>=CI_datenums(dind)-60);
+    tmp = SRP_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_maumee_60(dind) = nanmean(tmp);
+    
+    % from raisin river
+    ind = find(SRP_datenums_raisin<CI_datenums(dind) & SRP_datenums_raisin>=CI_datenums(dind)-30);
+    tmp = SRP_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_raisin_30(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_raisin<CI_datenums(dind) & SRP_datenums_raisin>=CI_datenums(dind)-40);
+    tmp = SRP_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_raisin_40(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_raisin<CI_datenums(dind) & SRP_datenums_raisin>=CI_datenums(dind)-50);
+    tmp = SRP_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_raisin_50(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_raisin<CI_datenums(dind) & SRP_datenums_raisin>=CI_datenums(dind)-60);
+    tmp = SRP_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_raisin_60(dind) = nanmean(tmp);
+    
+    % from sandusky river
+    ind = find(SRP_datenums_sandusky<CI_datenums(dind) & SRP_datenums_sandusky>=CI_datenums(dind)-30);
+    tmp = SRP_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_sandusky_30(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_sandusky<CI_datenums(dind) & SRP_datenums_sandusky>=CI_datenums(dind)-40);
+    tmp = SRP_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_sandusky_40(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_sandusky<CI_datenums(dind) & SRP_datenums_sandusky>=CI_datenums(dind)-50);
+    tmp = SRP_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_sandusky_50(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_sandusky<CI_datenums(dind) & SRP_datenums_sandusky>=CI_datenums(dind)-60);
+    tmp = SRP_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_sandusky_60(dind) = nanmean(tmp);
+    
+    % from cuyahoga river
+    ind = find(SRP_datenums_cuyahoga<CI_datenums(dind) & SRP_datenums_cuyahoga>=CI_datenums(dind)-30);
+    tmp = SRP_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_cuyahoga_30(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_cuyahoga<CI_datenums(dind) & SRP_datenums_cuyahoga>=CI_datenums(dind)-40);
+    tmp = SRP_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_cuyahoga_40(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_cuyahoga<CI_datenums(dind) & SRP_datenums_cuyahoga>=CI_datenums(dind)-50);
+    tmp = SRP_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_cuyahoga_50(dind) = nanmean(tmp);
+    
+    ind = find(SRP_datenums_cuyahoga<CI_datenums(dind) & SRP_datenums_cuyahoga>=CI_datenums(dind)-60);
+    tmp = SRP_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_SRP_cuyahoga_60(dind) = nanmean(tmp);
+    
+    
+    
+    
+    %% average TSS within last 20,30, 40,50,and 60 days
+    % from maumee river
+    ind = find(TSS_datenums_maumee<CI_datenums(dind) & TSS_datenums_maumee>=CI_datenums(dind)-30);
+    tmp = TSS_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_maumee_30(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_maumee<CI_datenums(dind) & TSS_datenums_maumee>=CI_datenums(dind)-40);
+    tmp = TSS_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_maumee_40(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_maumee<CI_datenums(dind) & TSS_datenums_maumee>=CI_datenums(dind)-50);
+    tmp = TSS_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_maumee_50(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_maumee<CI_datenums(dind) & TSS_datenums_maumee>=CI_datenums(dind)-60);
+    tmp = TSS_maumee(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_maumee_60(dind) = nanmean(tmp);
+    
+    % from raisin river
+    ind = find(TSS_datenums_raisin<CI_datenums(dind) & TSS_datenums_raisin>=CI_datenums(dind)-30);
+    tmp = TSS_raisin(ind);
+    tmp(isinf(tmp)) = NaN;    
+    avg_TSS_raisin_30(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_raisin<CI_datenums(dind) & TSS_datenums_raisin>=CI_datenums(dind)-40);
+    tmp = TSS_raisin(ind);
+    tmp(isinf(tmp)) = NaN;  
+    avg_TSS_raisin_40(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_raisin<CI_datenums(dind) & TSS_datenums_raisin>=CI_datenums(dind)-50);
+    tmp = TSS_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_raisin_50(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_raisin<CI_datenums(dind) & TSS_datenums_raisin>=CI_datenums(dind)-60);
+    tmp = TSS_raisin(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_raisin_60(dind) = nanmean(tmp);
+    
+    % from sandusky river
+    ind = find(TSS_datenums_sandusky<CI_datenums(dind) & TSS_datenums_sandusky>=CI_datenums(dind)-30);
+    tmp = TSS_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_sandusky_30(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_sandusky<CI_datenums(dind) & TSS_datenums_sandusky>=CI_datenums(dind)-40);
+    tmp = TSS_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_sandusky_40(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_sandusky<CI_datenums(dind) & TSS_datenums_sandusky>=CI_datenums(dind)-50);
+    tmp = TSS_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_sandusky_50(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_sandusky<CI_datenums(dind) & TSS_datenums_sandusky>=CI_datenums(dind)-60);
+    tmp = TSS_sandusky(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_sandusky_60(dind) = nanmean(tmp);
+    
+    % from cuyahoga river
+    ind = find(TSS_datenums_cuyahoga<CI_datenums(dind) & TSS_datenums_cuyahoga>=CI_datenums(dind)-30);
+    tmp = TSS_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_cuyahoga_30(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_cuyahoga<CI_datenums(dind) & TSS_datenums_cuyahoga>=CI_datenums(dind)-40);
+    tmp = TSS_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_cuyahoga_40(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_cuyahoga<CI_datenums(dind) & TSS_datenums_cuyahoga>=CI_datenums(dind)-50);
+    tmp = TSS_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_cuyahoga_50(dind) = nanmean(tmp);
+    
+    ind = find(TSS_datenums_cuyahoga<CI_datenums(dind) & TSS_datenums_cuyahoga>=CI_datenums(dind)-60);
+    tmp = TSS_cuyahoga(ind);
+    tmp(isinf(tmp)) = NaN;
+    avg_TSS_cuyahoga_60(dind) = nanmean(tmp);
+    
+    
+    
     
     %% average streamflows within last 20,30, 40,50,and 60 days
     % from maumee river
@@ -597,6 +1071,9 @@ for dind = 1:length(CI_datenums)
     
     ind = find(strm_datenums_cuyahoga<CI_datenums(dind) & strm_datenums_cuyahoga>=CI_datenums(dind)-60);
     avg_strm_cuyahoga_60(dind) = nanmean(strm_vals_cuyahoga(ind));
+    
+    
+    
 end
 %}
 %% arrange data in a matrix
@@ -604,24 +1081,29 @@ end
 data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_atemp',...
     avg_TP_maumee',avg_TP_raisin',avg_TP_sandusky',avg_TP_cuyahoga',...
     avg_TKN_maumee',avg_TKN_raisin',avg_TKN_sandusky',avg_TKN_cuyahoga',...
+    avg_NO23_maumee',avg_NO23_raisin',avg_NO23_sandusky',avg_NO23_cuyahoga',...
+    avg_SRP_maumee',avg_SRP_raisin',avg_SRP_sandusky',avg_SRP_cuyahoga',...
+    avg_TSS_maumee',avg_TSS_raisin',avg_TSS_sandusky',avg_TSS_cuyahoga',...
     avg_strm_maumee',avg_strm_raisin',avg_strm_sandusky',avg_strm_cuyahoga',...
-    TN_TP_ratio_maumee',TN_TP_ratio_raisin',TN_TP_ratio_sandusky',TN_TP_ratio_cuyahoga',avg_SR',avg_WL',avg_sd'];
+    TN_TP_ratio_maumee',TN_TP_ratio_raisin',TN_TP_ratio_sandusky',TN_TP_ratio_cuyahoga',...
+    TN_NO23_ratio_maumee',TN_NO23_ratio_raisin',TN_NO23_ratio_sandusky',TN_NO23_ratio_cuyahoga',...
+    avg_SR',avg_WL',avg_sd'];
 
 %% add previous time-step data
 data = sortrows(data);                      % arrange the data in increasing order of dates
-data = [data,NaN*ones(size(data,1),26)];     
+data = [data,NaN*ones(size(data,1),42)];     
 
-for dind = 4:size(data,1)
+for dind = 2:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-3,1)==30
-        data(dind,28:end) = data(dind-3,2:27);
+    if datenum_tmp - data(dind-1,1)==10
+        data(dind,44:end) = data(dind-1,2:43);
     end
     
 end
 
 %% remove 'seechi depth at current time-step' column
-data(:,27) = [];
+data(:,43) = [];
 
 %% add spring TP and TKN
 data = [data,zeros(size(data,1),12)];
@@ -704,23 +1186,31 @@ end
 data = [data,time_step'];
 %% save data to a textfile
 
-fname = 'model_data_30_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
+fname = 'model_data_10_04_26_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
-fprintf(fid,[repmat('%s\t',1,82),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
+fprintf(fid,[repmat('%s\t',1,114),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
     'min_air_temperature(t)(\circC)','avg_air_temperature(t)(\circC)','max_air_temperature(t)(\circC)',...
     'avg_TP_maumee(t)(Kg/day)','avg_TP_raisin(t)(Kg/day)','avg_TP_sandusky(t)(Kg/day)','avg_TP_cuyahoga(t)(Kg/day)',...
     'avg_TKN_maumee(t)(Kg/day)','avg_TKN_raisin(t)(Kg/day)','avg_TKN_sandusky(t)(Kg/day)','avg_TKN_cuyahoga(t)(Kg/day)',...
+    'avg_NO23_maumee(t)(Kg/day)','avg_NO23_raisin(t)(Kg/day)','avg_NO23_sandusky(t)(Kg/day)','avg_NO23_cuyahoga(t)(Kg/day)',...
+    'avg_SRP_maumee(t)(Kg/day)','avg_SRP_raisin(t)(Kg/day)','avg_SRP_sandusky(t)(Kg/day)','avg_SRP_cuyahoga(t)(Kg/day)',...
+    'avg_TSS_maumee(t)(Kg/day)','avg_TSS_raisin(t)(Kg/day)','avg_TSS_sandusky(t)(Kg/day)','avg_TSS_cuyahoga(t)(Kg/day)',...
     'avg_streamflow_maumee(t)(cms)','avg_streamflow_raisin(t)(cms)','avg_streamflow_sandusky(t)(cms)','avg_streamflow_cuyahoga(t)(cms)',...
-    'TP_TKN_ratio_maumee(t)','TP_TKN_ratio_raisin(t)','TP_TKN_ratio_sandusky(t)','TP_TKN_ratio_cuyahoga(t)',...
+    'TKN_TP_ratio_maumee(t)','TKN_TP_ratio_raisin(t)','TKN_TP_ratio_sandusky(t)','TKN_TP_ratio_cuyahoga(t)',...
+    'TKN_NO23_ratio_maumee(t)','TKN_NO23_ratio_raisin(t)','TKN_NO23_ratio_sandusky(t)','TKN_NO23_ratio_cuyahoga(t)',...
     'avg_solar_radiation(t)(W/m2)','avg_water_level(t)(m)',...
-    'CI(t-3)','min_wind_speed(t-3)(m/s)','avg_wind_speed(t-3)(m/s)','max_wind_speed(t-3)(m/s)',...
-    'min_air_temperature(t-3)(\circC)','avg_air_temperature(t-3)(\circC)','max_air_temperature(t-3)(\circC)',...
-    'avg_TP_maumee(t-3)(Kg/day)','avg_TP_raisin(t-3)(Kg/day)','avg_TP_sandusky(t-3)(Kg/day)','avg_TP_cuyahoga(t-3)(Kg/day)',...
-    'avg_TKN_maumee(t-3)(Kg/day)','avg_TKN_raisin(t-3)(Kg/day)','avg_TKN_sandusky(t-3)(Kg/day)','avg_TKN_cuyahoga(t-3)(Kg/day)',...
-    'average_streamflow_maumee(t-3)(cms)','average_streamflow_raisin(t-3)(cms)','average_streamflow_sandusky(t-3)(cms)','average_streamflow_cuyahoga(t-3)(cms)',...
-    'TP_TKN_ratio_maumee(t-3)','TP_TKN_ratio_raisin(t-3)','TP_TKN_ratio_sandusky(t-3)','TP_TKN_ratio_cuyahoga(t-3)',...
-    'avg_solar_radiation(t-3)(W/m2)','avg_water_level(t-3)(m)','secchi_depth(t-3)(m)',...
+    'CI(t-1)','min_wind_speed(t-1)(m/s)','avg_wind_speed(t-1)(m/s)','max_wind_speed(t-1)(m/s)',...
+    'min_air_temperature(t-1)(\circC)','avg_air_temperature(t-1)(\circC)','max_air_temperature(t-1)(\circC)',...
+    'avg_TP_maumee(t-1)(Kg/day)','avg_TP_raisin(t-1)(Kg/day)','avg_TP_sandusky(t-1)(Kg/day)','avg_TP_cuyahoga(t-1)(Kg/day)',...
+    'avg_TKN_maumee(t-1)(Kg/day)','avg_TKN_raisin(t-1)(Kg/day)','avg_TKN_sandusky(t-1)(Kg/day)','avg_TKN_cuyahoga(t-1)(Kg/day)',...
+    'avg_NO23_maumee(t-1)(Kg/day)','avg_NO23_raisin(t-1)(Kg/day)','avg_NO23_sandusky(t-1)(Kg/day)','avg_NO23_cuyahoga(t-1)(Kg/day)',...
+    'avg_SRP_maumee(t-1)(Kg/day)','avg_SRP_raisin(t-1)(Kg/day)','avg_SRP_sandusky(t-1)(Kg/day)','avg_SRP_cuyahoga(t-1)(Kg/day)',...
+    'avg_TSS_maumee(t-1)(Kg/day)','avg_TSS_raisin(t-1)(Kg/day)','avg_TSS_sandusky(t-1)(Kg/day)','avg_TSS_cuyahoga(t-1)(Kg/day)',...
+    'average_streamflow_maumee(t-1)(cms)','average_streamflow_raisin(t-1)(cms)','average_streamflow_sandusky(t-1)(cms)','average_streamflow_cuyahoga(t-1)(cms)',...
+    'TKN_TP_ratio_maumee(t-1)','TKN_TP_ratio_raisin(t-1)','TKN_TP_ratio_sandusky(t-1)','TKN_TP_ratio_cuyahoga(t-1)',...
+    'TKN_NO23_ratio_maumee(t-1)','TKN_NO23_ratio_raisin(t-1)','TKN_NO23_ratio_sandusky(t-1)','TKN_NO23_ratio_cuyahoga(t-1)',...
+    'avg_solar_radiation(t-1)(W/m2)','avg_water_level(t-1)(m)','secchi_depth(t-1)(m)',...
     'spring_TP_maumee(Kg)','spring_TP_raisin(Kg)','spring_TP_sandusky(Kg)','spring_TP_cuyahoga(Kg)',...
     'spring_TKN_maumee(Kg)','spring_TKN_raisin(Kg)','spring_TKN_sandusky(Kg)','spring_TKN_cuyahoga(Kg)',...
     'Legacy_TP_maumee(Kg)','Legacy_TP_raisin(Kg)','Legacy_TP_sandusky(Kg)','Legacy_TP_cuyahoga(Kg)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
@@ -730,36 +1220,58 @@ fprintf(fid,[repmat('%s\t',1,82),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)
 
 for dind = 1:size(data,1)
     
-    fprintf(fid,['%s\t',repmat('%f\t',1,81),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
+    fprintf(fid,['%s\t',repmat('%f\t',1,113),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
     
 end
 fclose(fid);
 %}
 
 %% arrange time-integrated data into a matrix and write to a textfile
-%{
+%
 data = [CI_vals,avg_TP_maumee_30',avg_TP_maumee_40',avg_TP_maumee_50',avg_TP_maumee_60',avg_TP_raisin_30',avg_TP_raisin_40',avg_TP_raisin_50',...
     avg_TP_raisin_60',avg_TP_sandusky_30',avg_TP_sandusky_40',avg_TP_sandusky_50',avg_TP_sandusky_60',avg_TP_cuyahoga_30',avg_TP_cuyahoga_40',...
-    avg_TP_cuyahoga_50',avg_TP_cuyahoga_60',avg_TKN_maumee_30',avg_TKN_maumee_40',avg_TKN_maumee_50',avg_TKN_maumee_60',avg_TKN_raisin_30',...
+    avg_TP_cuyahoga_50',avg_TP_cuyahoga_60',...
+avg_TKN_maumee_30',avg_TKN_maumee_40',avg_TKN_maumee_50',avg_TKN_maumee_60',avg_TKN_raisin_30',...
     avg_TKN_raisin_40',avg_TKN_raisin_50',avg_TKN_raisin_60',avg_TKN_sandusky_30',avg_TKN_sandusky_40',avg_TKN_sandusky_50',avg_TKN_sandusky_60',...
-    avg_TKN_cuyahoga_30',avg_TKN_cuyahoga_40',avg_TKN_cuyahoga_50',avg_TKN_cuyahoga_60',avg_strm_maumee_30',avg_strm_maumee_40',avg_strm_maumee_50',...
+    avg_TKN_cuyahoga_30',avg_TKN_cuyahoga_40',avg_TKN_cuyahoga_50',avg_TKN_cuyahoga_60',...
+avg_NO23_maumee_30',avg_NO23_maumee_40',avg_NO23_maumee_50',avg_NO23_maumee_60',avg_NO23_raisin_30',...
+    avg_NO23_raisin_40',avg_NO23_raisin_50',avg_NO23_raisin_60',avg_NO23_sandusky_30',avg_NO23_sandusky_40',avg_NO23_sandusky_50',avg_NO23_sandusky_60',...
+    avg_NO23_cuyahoga_30',avg_NO23_cuyahoga_40',avg_NO23_cuyahoga_50',avg_NO23_cuyahoga_60',...
+avg_SRP_maumee_30',avg_SRP_maumee_40',avg_SRP_maumee_50',avg_SRP_maumee_60',avg_SRP_raisin_30',...
+    avg_SRP_raisin_40',avg_SRP_raisin_50',avg_SRP_raisin_60',avg_SRP_sandusky_30',avg_SRP_sandusky_40',avg_SRP_sandusky_50',avg_SRP_sandusky_60',...
+    avg_SRP_cuyahoga_30',avg_SRP_cuyahoga_40',avg_SRP_cuyahoga_50',avg_SRP_cuyahoga_60',...
+avg_TSS_maumee_30',avg_TSS_maumee_40',avg_TSS_maumee_50',avg_TSS_maumee_60',avg_TSS_raisin_30',...
+    avg_TSS_raisin_40',avg_TSS_raisin_50',avg_TSS_raisin_60',avg_TSS_sandusky_30',avg_TSS_sandusky_40',avg_TSS_sandusky_50',avg_TSS_sandusky_60',...
+    avg_TSS_cuyahoga_30',avg_TSS_cuyahoga_40',avg_TSS_cuyahoga_50',avg_TSS_cuyahoga_60',...
+avg_strm_maumee_30',avg_strm_maumee_40',avg_strm_maumee_50',...
     avg_strm_maumee_60',avg_strm_raisin_30',avg_strm_raisin_40',avg_strm_raisin_50',avg_strm_raisin_60',avg_strm_sandusky_30',avg_strm_sandusky_40',...
     avg_strm_sandusky_50',avg_strm_sandusky_60',avg_strm_cuyahoga_30',avg_strm_cuyahoga_40',avg_strm_cuyahoga_50',avg_strm_cuyahoga_60'];
 
 % write data to a textfile
-fname = 'CI_time_integrated_data.txt';
+fname = 'CI_time_integrated_data_10_04_26_2022.txt';
 filename = fullfile(direc,fname);
 fid = fopen(filename,'w');
-formatspec = [repmat('%s\t',1,48),'%s\n'];
+formatspec = [repmat('%s\t',1,96),'%s\n'];
 fprintf(fid,formatspec,'CI_vals','avg_TP_maumee_30','avg_TP_maumee_40','avg_TP_maumee_50','avg_TP_maumee_60','avg_TP_raisin_30','avg_TP_raisin_40','avg_TP_raisin_50',...
     'avg_TP_raisin_60','avg_TP_sandusky_30','avg_TP_sandusky_40','avg_TP_sandusky_50','avg_TP_sandusky_60','avg_TP_cuyahoga_30','avg_TP_cuyahoga_40',...
-    'avg_TP_cuyahoga_50','avg_TP_cuyahoga_60','avg_TKN_maumee_30','avg_TKN_maumee_40','avg_TKN_maumee_50','avg_TKN_maumee_60','avg_TKN_raisin_30',...
+    'avg_TP_cuyahoga_50','avg_TP_cuyahoga_60',...
+'avg_TKN_maumee_30','avg_TKN_maumee_40','avg_TKN_maumee_50','avg_TKN_maumee_60','avg_TKN_raisin_30',...
     'avg_TKN_raisin_40','avg_TKN_raisin_50','avg_TKN_raisin_60','avg_TKN_sandusky_30','avg_TKN_sandusky_40','avg_TKN_sandusky_50','avg_TKN_sandusky_60',...
-    'avg_TKN_cuyahoga_30','avg_TKN_cuyahoga_40','avg_TKN_cuyahoga_50','avg_TKN_cuyahoga_60','avg_strm_maumee_30','avg_strm_maumee_40','avg_strm_maumee_50',...
+    'avg_TKN_cuyahoga_30','avg_TKN_cuyahoga_40','avg_TKN_cuyahoga_50','avg_TKN_cuyahoga_60',...
+'avg_NO23_maumee_30','avg_NO23_maumee_40','avg_NO23_maumee_50','avg_NO23_maumee_60','avg_NO23_raisin_30',...
+    'avg_NO23_raisin_40','avg_NO23_raisin_50','avg_NO23_raisin_60','avg_NO23_sandusky_30','avg_NO23_sandusky_40','avg_NO23_sandusky_50','avg_NO23_sandusky_60',...
+    'avg_NO23_cuyahoga_30','avg_NO23_cuyahoga_40','avg_NO23_cuyahoga_50','avg_NO23_cuyahoga_60',...
+'avg_SRP_maumee_30','avg_SRP_maumee_40','avg_SRP_maumee_50','avg_SRP_maumee_60','avg_SRP_raisin_30',...
+    'avg_SRP_raisin_40','avg_SRP_raisin_50','avg_SRP_raisin_60','avg_SRP_sandusky_30','avg_SRP_sandusky_40','avg_SRP_sandusky_50','avg_SRP_sandusky_60',...
+    'avg_SRP_cuyahoga_30','avg_SRP_cuyahoga_40','avg_SRP_cuyahoga_50','avg_SRP_cuyahoga_60',...
+'avg_TSS_maumee_30','avg_TSS_maumee_40','avg_TSS_maumee_50','avg_TSS_maumee_60','avg_TSS_raisin_30',...
+    'avg_TSS_raisin_40','avg_TSS_raisin_50','avg_TSS_raisin_60','avg_TSS_sandusky_30','avg_TSS_sandusky_40','avg_TSS_sandusky_50','avg_TSS_sandusky_60',...
+    'avg_TSS_cuyahoga_30','avg_TSS_cuyahoga_40','avg_TSS_cuyahoga_50','avg_TSS_cuyahoga_60',...
+'avg_strm_maumee_30','avg_strm_maumee_40','avg_strm_maumee_50',...
     'avg_strm_maumee_60','avg_strm_raisin_30','avg_strm_raisin_40','avg_strm_raisin_50','avg_strm_raisin_60','avg_strm_sandusky_30','avg_strm_sandusky_40',...
     'avg_strm_sandusky_50','avg_strm_sandusky_60','avg_strm_cuyahoga_30','avg_strm_cuyahoga_40','avg_strm_cuyahoga_50','avg_strm_cuyahoga_60');
 
-formatspec = [repmat('%f\t',1,48),'%f\n'];
+formatspec = [repmat('%f\t',1,96),'%f\n'];
 for data_ind = 1:size(data,1)
     
     fprintf(fid,formatspec,data(data_ind,:));
