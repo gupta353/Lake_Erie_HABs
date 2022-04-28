@@ -1154,7 +1154,7 @@ for dind = 3:size(data,1)
     
     datenum_tmp = data(dind,1);
     if datenum_tmp - data(dind-2,1)==20
-        data(dind,74) = data(dind-2,2);
+        data(dind,end) = data(dind-2,2);
     end
     
 end
@@ -1174,7 +1174,7 @@ data = [data,time_step'];
 fname = 'model_data_10_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
-fprintf(fid,[repmat('%s\t',1,114),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
+fprintf(fid,[repmat('%s\t',1,121),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
     'min_air_temperature(t)(\circC)','avg_air_temperature(t)(\circC)','max_air_temperature(t)(\circC)',...
     'avg_TP_maumee(t)(Kg/day)','avg_TP_raisin(t)(Kg/day)','avg_TP_sandusky(t)(Kg/day)','avg_TP_cuyahoga(t)(Kg/day)',...
     'avg_TKN_maumee(t)(Kg/day)','avg_TKN_raisin(t)(Kg/day)','avg_TKN_sandusky(t)(Kg/day)','avg_TKN_cuyahoga(t)(Kg/day)',...
