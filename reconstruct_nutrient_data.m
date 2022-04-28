@@ -12,20 +12,21 @@ strsplit_wrapper=@(x)strsplit(x,'/');
 calib_samples=30;                       % number of samples used for calibration
 
 % read wq concentration data
-fname_htlp='daily_granddata.txt';
+fname_htlp='daily_maumeedata.txt';
 filename=fullfile(direc_htlp,fname_htlp);
 data=readtable(filename,'delimiter','\t');
-date_wq=data.(1);
+date_wq=cellstr(data.(1));
 datenum_wq=cellfun(datenum_wrapper,date_wq);
-wq_conc=data.NO23_Mg_LAsN;
+wq_conc=data.SS_Mg_L_suspendedSolids_;
 wq_conc(wq_conc<0)=NaN;
-name = 'NO23';    % to be used as a name for the textfile where reconstructed data will saved
+name = 'TSS';    % to be used as a name for the textfile where reconstructed data will saved
+river_name = 'maumee';
 
 % read streamflow data
-fname='grand.txt';
+fname=[river_name,'.txt'];
 filename=fullfile(direc_htlp,'streamflow',fname);
 data=readtable(filename,'delimiter','\t');
-date_strm=data.(1);
+date_strm=cellstr(data.(1));
 datenum_strm=cellfun(datenum_wrapper,date_strm);
 strm=data.(2);              % streamflow in cfs
 
@@ -81,18 +82,19 @@ for i=1:length(nan_inds)
     
     % carry out bayesian regression
     res=bayesian_regress(constituent,modelNo,unitno);
-    conc=res.est.unbiasedLoad/constituent.est.Q*(10^3/3600/24*35.3);        % estimated concentration in mg/L
+    conc=res.est.unbiasedLoad/constituent.est.Q*(10^3/3600/24*35.3);        % estimated concentration in mg/L, load is in Kg/day
     
     % fill in the missing data
     wq_conc_tmp(nan_ind_tmp)=conc;
     
 end
+wq_conc_tmp(isinf(wq_conc_tmp)) = 0;
 wq_load=wq_conc_tmp.*strm*(10^(-3)/35.3*24*3600);   % WQ load in Kg/day
 % save reconstructed wq concentration data
-sname=['grand_reconstructed_',name,'_conc.txt'];
+sname=[river_name,'_reconstructed_',name,'_conc.txt'];
 save_filename=fullfile(direc_htlp,sname);
 fid=fopen(save_filename,'w');
-fprintf(fid,'%s\t%s\t%s\t%s\n','Date','SRP(mg/L)','streamflow(cfs)','SRP_load(Kg/day)');
+fprintf(fid,'%s\t%s\t%s\t%s\n','Date','TSS(mg/L)','streamflow(cfs)','TSS_load(Kg/day)');
 for write_ind=1:length(date)
     
     fprintf(fid,'%s\t%d\t%d\t%d\n',date{write_ind},wq_conc_tmp(write_ind),strm(write_ind),wq_load(write_ind));
