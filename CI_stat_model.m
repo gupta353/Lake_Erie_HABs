@@ -5,32 +5,34 @@ close all
 clc
 
 % read data
-fname = 'model_data_10_corr_CI_lag_included_and_TP_TKN_previous_120_and_time_step_included.txt';
+fname = 'model_data_10_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
-formatspec = ['%s',repmat('%f',1,82)];
+formatspec = ['%s',repmat('%f',1,121)];
 data = textscan(fid,formatspec,'delimiter','\t','headerlines',1);
 fclose(fid);
 
 dates = data{1};
 CI = data{2};
 preds = cat(2,data{3:end});
-preds(:,1:24) = [];
-preds(:,27:34) = []; % remove spring TP and TKN loads
-% preds(:,31:40) = []; % remove correlation-lag variables
+preds(:,1:40) = [];
+preds(:,43:50) = []; % remove spring TP and TKN loads
+preds(:,47:63) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
+preds(isinf(preds(:))) = 0;
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
-month_num = cellfun(wrapper,dates);
-% preds = [preds,month_num];
 pred_name = {'CI','Minimum wind speed','Average wind speed','Maximum wind speed','Minimum air temperature','Average air temperature','Maximum air temperature',...
     'Average TP Maumee','Average TP Raisin','Average TP Sandusky','Average TP Cuyahoga',...
     'Average TKN Maumee','Average TKN Raisin','Average TKN Sandusky','Average TKN Cuyahoga',...
+    'Average NO23 Maumee','Average NO23 Raisin','Average NO23 Sandusky','Average NO23 Cuyahoga',...
+    'Average SRP Maumee','Average SRP Raisin','Average SRP Sandusky','Average SRP Cuyahoga',...
+    'Average TSS Maumee','Average TSS Raisin','Average TSS Sandusky','Average TSS Cuyahoga',...
     'Average streamflow Maumee','Average streamflow Raisin','Average streamflow Sandusky','Average streamflow Cuyahoga',...
-    'Ratio of TP to TKN Maumee','Ratio of TP to TKN Raisin','Ratio of TP to TKN Sandusky','Ratio of TP to TKN Cuyahoga',...
+    'Ratio of TKN to TP Maumee','Ratio of TKN to TP Raisin','Ratio of TKN to TP Sandusky','Ratio of TKN to TP Cuyahoga',...
+    'Ratio of TKN to NO23 Maumee','Ratio of TKN to NO23 Raisin','Ratio of TKN to NO23 Sandusky','Ratio of TKN to NO23 Cuyahoga',...
     'Average solar radiation','Average water level','Secchi depth',...
-    'Spring TP Maumee','Spring TP Raisin','Spring TP Sandusky','Spring TP Cuyahoga',...
-    'Jan to Jun TKN Maumee','Jan to Jun TKN Raisin','Jan to Jun TKN Sandusky','Jan to Jun TKN Cuyahoga',...
-    'Legacy TP Maumee','Legacy TP Raisin','Legacy TP Sandusky','Legacy TP Cuyahoga'};
+    'Legacy TP Maumee','Legacy TP Raisin','Legacy TP Sandusky','Legacy TP Cuyahoga',...
+    'tot_TP_120_maumee','tot_TP_120_raisin', 'tot_TP_120_sandusky','tot_TP_120_cuyahoga','tot_TKN_120_maumee','tot_TKN_120_raisin','tot_TKN_120_sandusky','tot_TKN_120_cuyahoga','time_step_of_the_year'};
 
 % read cloud cover data
 fname = 'cloud_cover_MERIS_SEN.txt';
@@ -47,10 +49,18 @@ cc_dates(ind)  = [];
 cc(ind) = [];
 
 % remove outliers, zero CI values and missing values
-zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0 | isnan(preds(:,26)) | isnan(preds(:,40)) | isnan(preds(:,end)) | preds(:,end)==0);
+zero_ind = find(cc>0.10 | isnan(preds(:,2)) | preds(:,1)==0);
 CI(zero_ind) = [];
 preds(zero_ind,:) = [];
 dates(zero_ind) = [];
+
+% remove any remaining missing values
+for col = 1:size(preds,2)
+    zero_ind = find(isnan(preds(:,col)));
+    CI(zero_ind) = [];
+    preds(zero_ind,:) = [];
+    dates(zero_ind) = [];
+end
 
 % covert CIs into logarithmic scale
 CI = log(CI);
@@ -66,7 +76,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 rng(1);
 
 for count = 1:1000
@@ -85,7 +95,7 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-%
+%{
     % cross-validation
     NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
@@ -229,7 +239,7 @@ for count = 1:1000
 end
 %}
 end
-%
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -267,8 +277,9 @@ saveas(gcf,filename,'svg');
 %}
 %}
 %% cross-validation (no validation)
-%{
-for CI_ind =  1:length(CI)
+%
+Fitted_val = NaN*ones(length(CI),1);
+parfor CI_ind =  1:length(CI)
     CI_ind
     val_ind = CI_ind;
     cal_ind = setdiff(1:length(CI),val_ind);
@@ -276,7 +287,7 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%{
+%
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -284,8 +295,8 @@ for CI_ind =  1:length(CI)
 %}
     
     %% Random Forest
-%
-     NumTrees=25:25:100;
+%{
+    NumTrees=25:25:100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
     
@@ -308,10 +319,10 @@ for CI_ind =  1:length(CI)
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
     Fitted_val(CI_ind,1)=predict(B,preds_val);
 
-%
+%}
 end
 %}
-%{
+%
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
 xlim([2 6.5])
@@ -328,13 +339,13 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_time_steps_predictor_added.mat';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021',fname);
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.mat';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
 % Uncertainty analysis of residuals
@@ -380,12 +391,12 @@ fig2svg(filename)
 %% regression using important predictor variables
 %{
 % read beta values obtained by LASSO
-fname = 'LASSO_BS_corr_lag_CI_beta_values.mat';
+fname = 'RF_BS_corr_lag_CI_importance_values.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',fname);
 beta_vals = load(filename);
-beta_vals = beta_vals.beta;
+beta_vals = beta_vals.importance';
 % remove bias term
-beta_vals(1,:) = [];
+% beta_vals(1,:) = [];
 
 % compute median of beta values
 beta_M = mean(beta_vals,2);
@@ -395,10 +406,10 @@ beta_M = [beta_M,[1:49]'];
 beta_M = sortrows(beta_M);
 beta_M = flipud(beta_M);
 
-%{
+%
 for var_ind = 1:size(beta_M,1)
     preds_tmp = preds(:,beta_M(1:var_ind,2));
-    
+    var_ind
     for CI_ind =  1:length(CI)
         
         val_ind = CI_ind;
@@ -407,18 +418,42 @@ for var_ind = 1:size(beta_M,1)
         CI_val = CI(val_ind); preds_val = preds_tmp(val_ind,:);
         
         %% LASSO
-        %
+        %{
         [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
         ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
         beta = [Fitinfo.Intercept(ind);B(:,ind)];
         Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
         %}
+        
+        %% RF
+        NumTrees=25:25:100;
+        NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
+        MinLeaf=2:2:6;
+        
+        rcount = 0;
+        for par1_ind = 1:length(NumTrees)
+            for par2_ind = 1:length(NVarToSample)
+                for par3_ind = 1:length(MinLeaf)
+                    rcount = rcount+1;
+                    
+                    predfun = @(Xtrain,ytrain,Xtest)RFag(Xtrain,ytrain,Xtest,NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind));
+                    val = crossval('mse',preds_cal,CI_cal,'predfun',predfun);
+                    mse1(rcount,:) = [NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind),val];
+                    
+                end
+            end
+        end
+        
+        ind = find(mse1(:,4) == min(mse1(:,4)));
+        B = TreeBagger(mse1(ind,1),preds_cal,CI_cal,...
+            'Method','regression','NVarToSample',mse1(ind,2),'MinLeaf',mse1(ind,3),'oobvarimp','on');
+        Fitted_val(CI_ind,1)=predict(B,preds_val);
     end
     mse(var_ind) = mean((CI-Fitted_val).^2);
     R21(var_ind) = corr(CI,Fitted_val)^2;
 end
 
-% plot mean-square-error 
+% plot mean-square-error
 plot(mse,'-o','linewidth',1,'color','black','Markeredgecolor','b','Markerfacecolor','b');
 xlabel('Predictor variable','fontname','arial','fontsize',12)
 ylabel('Mean-squared-error','fontname','arial','fontsize',12)
@@ -428,12 +463,12 @@ set(gca,'fontname','arial','fontsize',12,'plotboxaspectratio',[2 1 1],'ylim',[mi
 clear box
 
 % save plot
-sname = 'mse_predictor_importance.svg';
+sname = 'LASSO_mse_predictor_importance.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',sname);
 fig2svg(filename);
 
 % save data
-sname = 'mse_predictor_importance.mat';
+sname = 'RF_mse_predictor_importance.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021','10_days_lead_time_prediction',sname);
 save(filename);
 
