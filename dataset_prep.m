@@ -642,11 +642,11 @@ for year_ind = 1:length(years_datenum)
     
 end
 
-%% compute TP, TKN and streamflow integrated in time within last 20,30,40,50,and 60 days
+%% compute TP, TKN and streamflow integrated in time within last 30,40,50,and 60 days
 %
 for dind = 1:length(CI_datenums)
     
-    %% average TP within last 20,30, 40,50,and 60 days
+    %% average TP within last 30, 40,50,and 60 days
     % from maumee river
     ind = find(TP_datenums_maumee<CI_datenums(dind) & TP_datenums_maumee>=CI_datenums(dind)-30);
     avg_TP_maumee_30(dind) = nanmean(TP_maumee(ind));
@@ -1143,24 +1143,9 @@ for dind = 1:length(CI_datenums)
     ind = find(WL_datenums>=CI_datenums(dind)-60 & WL_datenums<=CI_datenums(dind)-50);
     avg_WL_corr(dind) = nanmean([WL_vals(ind);NaN]);
     
-    % Average TP from maumee river 
-    ind = find(TP_datenums_maumee>=CI_datenums(dind)-30 & TP_datenums_maumee<=CI_datenums(dind)-1);
-    avg_TP_maumee_30(dind) = nanmean(TP_maumee(ind));
-    
-    % Average TP from raisin river
-    ind = find(TP_datenums_raisin>=CI_datenums(dind)-30 & TP_datenums_raisin<=CI_datenums(dind)-1);
-    avg_TP_raisin_30(dind) = nanmean(TP_raisin(ind));
-    
-    % Average TKN from maumee river
-    ind = find(TKN_datenums_maumee>=CI_datenums(dind)-30 & TKN_datenums_maumee<=CI_datenums(dind)-1);
-    avg_TKN_maumee_30(dind) = nanmean(TKN_maumee(ind));
-    
-    % Average TKN from raisin river
-    ind = find(TKN_datenums_raisin>=CI_datenums(dind)-30 & TKN_datenums_raisin<=CI_datenums(dind)-1);
-    avg_TKN_raisin_30(dind) = nanmean(TKN_raisin(ind));
     
 end
-data = [data,max_atemp_corr',min_atemp_corr',avg_atemp_corr',avg_SR_corr',avg_WL_corr',avg_TP_maumee_30',avg_TP_raisin_30',avg_TKN_maumee_30',avg_TKN_raisin_30'];
+data = [data,max_atemp_corr',min_atemp_corr',avg_atemp_corr',avg_SR_corr',avg_WL_corr',avg_TP_maumee_30',avg_TP_raisin_30',avg_TKN_maumee_60',avg_TKN_raisin_30',avg_NO23_maumee_30',avg_NO23_raisin_30', avg_SRP_maumee_30', avg_TSS_maumee_30', avg_TSS_raisin_30', avg_strm_maumee_30', avg_strm_raisin_30'];
 
 %% Add two time-step lag CI values to dataset
 data = [data,NaN*ones(size(data,1),1)];     
@@ -1186,7 +1171,7 @@ end
 data = [data,time_step'];
 %% save data to a textfile
 
-fname = 'model_data_10_04_26_2022.txt';
+fname = 'model_data_10_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
 fprintf(fid,[repmat('%s\t',1,114),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
@@ -1215,19 +1200,19 @@ fprintf(fid,[repmat('%s\t',1,114),'%s\n'],'begin_date','CI(t)','min_wind_speed(t
     'spring_TKN_maumee(Kg)','spring_TKN_raisin(Kg)','spring_TKN_sandusky(Kg)','spring_TKN_cuyahoga(Kg)',...
     'Legacy_TP_maumee(Kg)','Legacy_TP_raisin(Kg)','Legacy_TP_sandusky(Kg)','Legacy_TP_cuyahoga(Kg)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
     'avg_atemp_lag_3(\circC)','solar_radiation_30_lag_3(W/m^2)','avg_water_level_lag_6(m)','avg_TP_maumee_30(Kg/day)','avg_TP_raisin_30(Kg/day)',...
-    'avg_TKN_maumee_30(Kg/day)','avg_TKN_raisin_30(Kg/day)','CI(t-2)','tot_TP_120_maumee(Kg)','tot_TP_120_raisin(Kg)','tot_TP_120_sandusky(Kg)','tot_TP_120_cuyahoga(Kg)',...
+    'avg_TKN_maumee_60(Kg/day)','avg_TKN_raisin_30(Kg/day)','avg_NO23_maumee_30(Kg/day)','avg_NO23_raisin_30(Kg/day)','avg_SRP_maumee_30(Kg/day)','avg_TSS_maumee_30(Kg/day)','avg_TSS_raisin_30(Kg/day)','avg_strm_maumee_30(cms)','avg_strm_raisin_30(cms)','CI(t-2)','tot_TP_120_maumee(Kg)','tot_TP_120_raisin(Kg)','tot_TP_120_sandusky(Kg)','tot_TP_120_cuyahoga(Kg)',...
     'tot_TKN_120_maumee(Kg)','tot_TKN_120_raisin(Kg)','tot_TKN_120_sandusky(Kg)','tot_TKN_120_cuyahoga(Kg)','time_step_of_the_year');
 
 for dind = 1:size(data,1)
     
-    fprintf(fid,['%s\t',repmat('%f\t',1,113),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
+    fprintf(fid,['%s\t',repmat('%f\t',1,120),'%f\n'],datestr(data(dind,1),'dd-mmm-yyyy'),data(dind,2:end));
     
 end
 fclose(fid);
 %}
 
 %% arrange time-integrated data into a matrix and write to a textfile
-%
+%{
 data = [CI_vals,avg_TP_maumee_30',avg_TP_maumee_40',avg_TP_maumee_50',avg_TP_maumee_60',avg_TP_raisin_30',avg_TP_raisin_40',avg_TP_raisin_50',...
     avg_TP_raisin_60',avg_TP_sandusky_30',avg_TP_sandusky_40',avg_TP_sandusky_50',avg_TP_sandusky_60',avg_TP_cuyahoga_30',avg_TP_cuyahoga_40',...
     avg_TP_cuyahoga_50',avg_TP_cuyahoga_60',...
