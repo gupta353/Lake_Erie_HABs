@@ -17,7 +17,7 @@ CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:40) = [];
 preds(:,43:50) = []; % remove spring TP and TKN loads
-preds(:,47:63) = []; % remove correlation-lag variables
+% preds(:,47:63) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
 preds(isinf(preds(:))) = 0;
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
@@ -348,12 +348,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.mat';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
