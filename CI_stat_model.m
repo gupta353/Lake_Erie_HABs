@@ -287,7 +287,7 @@ parfor CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -295,7 +295,7 @@ parfor CI_ind =  1:length(CI)
 %}
     
     %% Random Forest
-%{
+%
     NumTrees = 100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -348,12 +348,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.svg';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.mat';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
