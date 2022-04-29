@@ -770,7 +770,7 @@ for dind = 1:length(CI_datenums)
 end
 data = [data,time_step'];
 %% save data to a textfile
-%{
+%
 fname = 'model_data_10_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
@@ -813,7 +813,7 @@ fclose(fid);
 %}
 
 %% arrange time-integrated data into a matrix and write to a textfile
-%
+%{
 data = [CI_vals,avg_TP_maumee_30',avg_TP_maumee_40',avg_TP_maumee_50',avg_TP_maumee_60',avg_TP_raisin_30',avg_TP_raisin_40',avg_TP_raisin_50',...
     avg_TP_raisin_60',avg_TP_sandusky_30',avg_TP_sandusky_40',avg_TP_sandusky_50',avg_TP_sandusky_60',avg_TP_cuyahoga_30',avg_TP_cuyahoga_40',...
     avg_TP_cuyahoga_50',avg_TP_cuyahoga_60',...
