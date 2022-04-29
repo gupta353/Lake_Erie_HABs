@@ -554,8 +554,8 @@ end
 %
 for dind = 1:length(CI_datenums)
     
-    begin_datenum = CI_datenums(dind)-130;
-    end_datenum = CI_datenums(dind)-10;
+    begin_datenum = CI_datenums(dind)-140;
+    end_datenum = CI_datenums(dind)-20;
     
     % from maumee river
     ind1 = find(TP_datenums_maumee>=begin_datenum & TP_datenums_maumee<=end_datenum);
@@ -693,11 +693,11 @@ data = [CI_datenums,CI_vals,min_ws',avg_ws',max_ws',min_atemp',avg_atemp',max_at
 data = sortrows(data);                      % arrange the data in increasing order of dates
 data = [data,NaN*ones(size(data,1),42)];     
 
-for dind = 3:size(data,1)
+for dind = 4:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-2,1)==20
-        data(dind,44:end) = data(dind-2,2:43);
+    if datenum_tmp - data(dind-3,1)==30
+        data(dind,44:end) = data(dind-3,2:43);
     end
     
 end
@@ -724,15 +724,15 @@ end
 for dind = 1:length(CI_datenums)
        
     % max air temperature
-    ind = find(max_atemp_datenums>=CI_datenums(dind)-30 & max_atemp_datenums<=CI_datenums(dind)-21);
+    ind = find(max_atemp_datenums>=CI_datenums(dind)-40 & max_atemp_datenums<=CI_datenums(dind)-31);
     max_atemp_corr(dind) = max([max_atemp_vals(ind);NaN]);
     
     % min air temperature
-    ind = find(min_atemp_datenums>=CI_datenums(dind)-30 & min_atemp_datenums<=CI_datenums(dind)-21);
+    ind = find(min_atemp_datenums>=CI_datenums(dind)-40 & min_atemp_datenums<=CI_datenums(dind)-31);
     min_atemp_corr(dind) = min([min_atemp_vals(ind);NaN]);
     
     % mean air temperature
-    ind = find(mean_atemp_datenums>=CI_datenums(dind)-30 & mean_atemp_datenums<=CI_datenums(dind)-21);
+    ind = find(mean_atemp_datenums>=CI_datenums(dind)-40 & mean_atemp_datenums<=CI_datenums(dind)-31);
     avg_atemp_corr(dind) = nanmean([mean_atemp_vals(ind);NaN]);
     
     % solar radiation
@@ -750,11 +750,11 @@ data = [data,max_atemp_corr',min_atemp_corr',avg_atemp_corr',avg_SR_corr',avg_WL
 %% Add two (for 10 days), three (for 20 days) and four (for 30 days lead time prediction) time-step lag CI values to dataset
 data = [data,NaN*ones(size(data,1),1)];     
 
-for dind = 4:size(data,1)
+for dind = 5:size(data,1)
     
     datenum_tmp = data(dind,1);
-    if datenum_tmp - data(dind-3,1) == 30
-        data(dind,end) = data(dind-3,2);
+    if datenum_tmp - data(dind-4,1) == 40
+        data(dind,end) = data(dind-4,2);
     end
     
 end
@@ -771,7 +771,7 @@ end
 data = [data,time_step'];
 %% save data to a textfile
 %
-fname = 'model_data_20_04_28_2022.txt';
+fname = 'model_data_30_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'w');
 fprintf(fid,[repmat('%s\t',1,121),'%s\n'],'begin_date','CI(t)','min_wind_speed(t)(m/s)','avg_wind_speed(t)(m/s)','max_wind_speed(t)(m/s)',...
@@ -785,23 +785,23 @@ fprintf(fid,[repmat('%s\t',1,121),'%s\n'],'begin_date','CI(t)','min_wind_speed(t
     'TKN_TP_ratio_maumee(t)','TKN_TP_ratio_raisin(t)','TKN_TP_ratio_sandusky(t)','TKN_TP_ratio_cuyahoga(t)',...
     'TKN_NO23_ratio_maumee(t)','TKN_NO23_ratio_raisin(t)','TKN_NO23_ratio_sandusky(t)','TKN_NO23_ratio_cuyahoga(t)',...
     'avg_solar_radiation(t)(W/m2)','avg_water_level(t)(m)',...
-    'CI(t-2)','min_wind_speed(t-2)(m/s)','avg_wind_speed(t-2)(m/s)','max_wind_speed(t-2)(m/s)',...
-    'min_air_temperature(t-2)(\circC)','avg_air_temperature(t-2)(\circC)','max_air_temperature(t-2)(\circC)',...
-    'avg_TP_maumee(t-2)(Kg/day)','avg_TP_raisin(t-2)(Kg/day)','avg_TP_sandusky(t-2)(Kg/day)','avg_TP_cuyahoga(t-2)(Kg/day)',...
-    'avg_TKN_maumee(t-2)(Kg/day)','avg_TKN_raisin(t-2)(Kg/day)','avg_TKN_sandusky(t-2)(Kg/day)','avg_TKN_cuyahoga(t-2)(Kg/day)',...
-    'avg_NO23_maumee(t-2)(Kg/day)','avg_NO23_raisin(t-2)(Kg/day)','avg_NO23_sandusky(t-2)(Kg/day)','avg_NO23_cuyahoga(t-2)(Kg/day)',...
-    'avg_SRP_maumee(t-2)(Kg/day)','avg_SRP_raisin(t-2)(Kg/day)','avg_SRP_sandusky(t-2)(Kg/day)','avg_SRP_cuyahoga(t-2)(Kg/day)',...
-    'avg_TSS_maumee(t-2)(Kg/day)','avg_TSS_raisin(t-2)(Kg/day)','avg_TSS_sandusky(t-2)(Kg/day)','avg_TSS_cuyahoga(t-2)(Kg/day)',...
-    'average_streamflow_maumee(t-2)(cms)','average_streamflow_raisin(t-2)(cms)','average_streamflow_sandusky(t-2)(cms)','average_streamflow_cuyahoga(t-2)(cms)',...
-    'TKN_TP_ratio_maumee(t-2)','TKN_TP_ratio_raisin(t-2)','TKN_TP_ratio_sandusky(t-2)','TKN_TP_ratio_cuyahoga(t-2)',...
-    'TKN_NO23_ratio_maumee(t-2)','TKN_NO23_ratio_raisin(t-2)','TKN_NO23_ratio_sandusky(t-2)','TKN_NO23_ratio_cuyahoga(t-2)',...
-    'avg_solar_radiation(t-2)(W/m2)','avg_water_level(t-2)(m)','secchi_depth(t-2)(m)',...
+    'CI(t-3)','min_wind_speed(t-3)(m/s)','avg_wind_speed(t-3)(m/s)','max_wind_speed(t-3)(m/s)',...
+    'min_air_temperature(t-3)(\circC)','avg_air_temperature(t-3)(\circC)','max_air_temperature(t-3)(\circC)',...
+    'avg_TP_maumee(t-3)(Kg/day)','avg_TP_raisin(t-3)(Kg/day)','avg_TP_sandusky(t-3)(Kg/day)','avg_TP_cuyahoga(t-3)(Kg/day)',...
+    'avg_TKN_maumee(t-3)(Kg/day)','avg_TKN_raisin(t-3)(Kg/day)','avg_TKN_sandusky(t-3)(Kg/day)','avg_TKN_cuyahoga(t-3)(Kg/day)',...
+    'avg_NO23_maumee(t-3)(Kg/day)','avg_NO23_raisin(t-3)(Kg/day)','avg_NO23_sandusky(t-3)(Kg/day)','avg_NO23_cuyahoga(t-3)(Kg/day)',...
+    'avg_SRP_maumee(t-3)(Kg/day)','avg_SRP_raisin(t-3)(Kg/day)','avg_SRP_sandusky(t-3)(Kg/day)','avg_SRP_cuyahoga(t-3)(Kg/day)',...
+    'avg_TSS_maumee(t-3)(Kg/day)','avg_TSS_raisin(t-3)(Kg/day)','avg_TSS_sandusky(t-3)(Kg/day)','avg_TSS_cuyahoga(t-3)(Kg/day)',...
+    'average_streamflow_maumee(t-3)(cms)','average_streamflow_raisin(t-3)(cms)','average_streamflow_sandusky(t-3)(cms)','average_streamflow_cuyahoga(t-3)(cms)',...
+    'TKN_TP_ratio_maumee(t-3)','TKN_TP_ratio_raisin(t-3)','TKN_TP_ratio_sandusky(t-3)','TKN_TP_ratio_cuyahoga(t-3)',...
+    'TKN_NO23_ratio_maumee(t-3)','TKN_NO23_ratio_raisin(t-3)','TKN_NO23_ratio_sandusky(t-3)','TKN_NO23_ratio_cuyahoga(t-3)',...
+    'avg_solar_radiation(t-3)(W/m2)','avg_water_level(t-3)(m)','secchi_depth(t-3)(m)',...
     'spring_TP_maumee(Kg)','spring_TP_raisin(Kg)','spring_TP_sandusky(Kg)','spring_TP_cuyahoga(Kg)',...
     'spring_TKN_maumee(Kg)','spring_TKN_raisin(Kg)','spring_TKN_sandusky(Kg)','spring_TKN_cuyahoga(Kg)',...
-    'Legacy_TP_maumee(Kg)','Legacy_TP_raisin(Kg)','Legacy_TP_sandusky(Kg)','Legacy_TP_cuyahoga(Kg)','max_atemp_lag_3(\circC)','min_atemp_lag_3(\circC)',...
-    'avg_atemp_lag_2(\circC)','solar_radiation_30_lag_2(W/m^2)','avg_water_level_lag_5(m)','avg_TP_maumee_30(Kg/day)','avg_TP_raisin_30(Kg/day)',...
+    'Legacy_TP_maumee(Kg)','Legacy_TP_raisin(Kg)','Legacy_TP_sandusky(Kg)','Legacy_TP_cuyahoga(Kg)','max_atemp_lag_2(\circC)','min_atemp_lag_2(\circC)',...
+    'avg_atemp_lag_2(\circC)','solar_radiation_30_lag_2(W/m^2)','avg_water_level_lag_4(m)','avg_TP_maumee_30(Kg/day)','avg_TP_raisin_30(Kg/day)',...
     'avg_TKN_maumee_60(Kg/day)','avg_TKN_raisin_30(Kg/day)','avg_NO23_maumee_30(Kg/day)','avg_NO23_raisin_30(Kg/day)','avg_SRP_maumee_30(Kg/day)','avg_TSS_maumee_30(Kg/day)',...
-    'avg_TSS_raisin_30(Kg/day)','avg_strm_maumee_30(cms)','avg_strm_raisin_30(cms)','CI(t-3)','tot_TP_120_maumee(Kg)','tot_TP_120_raisin(Kg)','tot_TP_120_sandusky(Kg)','tot_TP_120_cuyahoga(Kg)',...
+    'avg_TSS_raisin_30(Kg/day)','avg_strm_maumee_30(cms)','avg_strm_raisin_30(cms)','CI(t-4)','tot_TP_120_maumee(Kg)','tot_TP_120_raisin(Kg)','tot_TP_120_sandusky(Kg)','tot_TP_120_cuyahoga(Kg)',...
     'tot_TKN_120_maumee(Kg)','tot_TKN_120_raisin(Kg)','tot_TKN_120_sandusky(Kg)','tot_TKN_120_cuyahoga(Kg)','time_step_of_the_year');
 
 for dind = 1:size(data,1)
@@ -872,85 +872,85 @@ function [avg_X_maumee_30, avg_X_maumee_40, avg_X_maumee_50, avg_X_maumee_60, av
 
     for dind = 1:length(CI_datenums)
         
-        ind = find(X_datenums_maumee<CI_datenums(dind)-10 & X_datenums_maumee>=CI_datenums(dind)-40);
+        ind = find(X_datenums_maumee<CI_datenums(dind)-20 & X_datenums_maumee>=CI_datenums(dind)-50);
         tmp = X_maumee(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_maumee_30(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_maumee<CI_datenums(dind)-10 & X_datenums_maumee>=CI_datenums(dind)-50);
+        ind = find(X_datenums_maumee<CI_datenums(dind)-20 & X_datenums_maumee>=CI_datenums(dind)-60);
         tmp = X_maumee(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_maumee_40(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_maumee<CI_datenums(dind)-10 & X_datenums_maumee>=CI_datenums(dind)-60);
+        ind = find(X_datenums_maumee<CI_datenums(dind)-20 & X_datenums_maumee>=CI_datenums(dind)-70);
         tmp = X_maumee(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_maumee_50(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_maumee<CI_datenums(dind)-10 & X_datenums_maumee>=CI_datenums(dind)-70);
+        ind = find(X_datenums_maumee<CI_datenums(dind)-20 & X_datenums_maumee>=CI_datenums(dind)-80);
         tmp = X_maumee(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_maumee_60(dind) = nanmean(tmp);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % from raisin river
-        ind = find(X_datenums_raisin<CI_datenums(dind)-10 & X_datenums_raisin>=CI_datenums(dind)-40);
+        ind = find(X_datenums_raisin<CI_datenums(dind)-20 & X_datenums_raisin>=CI_datenums(dind)-50);
         tmp = X_raisin(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_raisin_30(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_raisin<CI_datenums(dind)-10 & X_datenums_raisin>=CI_datenums(dind)-50);
+        ind = find(X_datenums_raisin<CI_datenums(dind)-20 & X_datenums_raisin>=CI_datenums(dind)-60);
         tmp = X_raisin(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_raisin_40(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_raisin<CI_datenums(dind)-10 & X_datenums_raisin>=CI_datenums(dind)-60);
+        ind = find(X_datenums_raisin<CI_datenums(dind)-20 & X_datenums_raisin>=CI_datenums(dind)-70);
         tmp = X_raisin(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_raisin_50(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_raisin<CI_datenums(dind)-10 & X_datenums_raisin>=CI_datenums(dind)-70);
+        ind = find(X_datenums_raisin<CI_datenums(dind)-20 & X_datenums_raisin>=CI_datenums(dind)-80);
         tmp = X_raisin(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_raisin_60(dind) = nanmean(tmp);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % from sandusky river
-        ind = find(X_datenums_sandusky<CI_datenums(dind)-10 & X_datenums_sandusky>=CI_datenums(dind)-40);
+        ind = find(X_datenums_sandusky<CI_datenums(dind)-20 & X_datenums_sandusky>=CI_datenums(dind)-50);
         tmp = X_sandusky(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_sandusky_30(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_sandusky<CI_datenums(dind)-10 & X_datenums_sandusky>=CI_datenums(dind)-50);
+        ind = find(X_datenums_sandusky<CI_datenums(dind)-20 & X_datenums_sandusky>=CI_datenums(dind)-60);
         tmp = X_sandusky(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_sandusky_40(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_sandusky<CI_datenums(dind)-10 & X_datenums_sandusky>=CI_datenums(dind)-60);
+        ind = find(X_datenums_sandusky<CI_datenums(dind)-20 & X_datenums_sandusky>=CI_datenums(dind)-70);
         tmp = X_sandusky(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_sandusky_50(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_sandusky<CI_datenums(dind)-10 & X_datenums_sandusky>=CI_datenums(dind)-70);
+        ind = find(X_datenums_sandusky<CI_datenums(dind)-20 & X_datenums_sandusky>=CI_datenums(dind)-80);
         tmp = X_sandusky(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_sandusky_60(dind) = nanmean(tmp);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % from cuyahoga river
-        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-10 & X_datenums_cuyahoga>=CI_datenums(dind)-40);
+        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-20 & X_datenums_cuyahoga>=CI_datenums(dind)-50);
         tmp = X_cuyahoga(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_cuyahoga_30(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-10 & X_datenums_cuyahoga>=CI_datenums(dind)-50);
+        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-20 & X_datenums_cuyahoga>=CI_datenums(dind)-60);
         tmp = X_cuyahoga(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_cuyahoga_40(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-10 & X_datenums_cuyahoga>=CI_datenums(dind)-60);
+        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-20 & X_datenums_cuyahoga>=CI_datenums(dind)-70);
         tmp = X_cuyahoga(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_cuyahoga_50(dind) = nanmean(tmp);
 
-        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-10 & X_datenums_cuyahoga>=CI_datenums(dind)-70);
+        ind = find(X_datenums_cuyahoga<CI_datenums(dind)-20 & X_datenums_cuyahoga>=CI_datenums(dind)-80);
         tmp = X_cuyahoga(ind);
         tmp(isinf(tmp)) = 0;
         avg_X_cuyahoga_60(dind) = nanmean(tmp);
