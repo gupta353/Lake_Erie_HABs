@@ -279,7 +279,7 @@ saveas(gcf,filename,'svg');
 %% cross-validation (no validation)
 %
 Fitted_val = NaN*ones(length(CI),1);
-parfor CI_ind =  1:length(CI)
+for CI_ind =  1:length(CI)
     CI_ind
     val_ind = CI_ind;
     cal_ind = setdiff(1:length(CI),val_ind);
@@ -287,7 +287,7 @@ parfor CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -296,11 +296,12 @@ parfor CI_ind =  1:length(CI)
     
     %% Random Forest
 %{
-    NumTrees=25:25:100;
+    NumTrees = 100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
     
     rcount = 0;
+    mse = zeros(length(NumTrees)*length(NVarToSample)*length(MinLeaf),4);
     for par1_ind = 1:length(NumTrees)
         for par2_ind = 1:length(NVarToSample)
             for par3_ind = 1:length(MinLeaf)
@@ -317,9 +318,16 @@ parfor CI_ind =  1:length(CI)
     ind = find(mse(:,4) == min(mse(:,4)));
     B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
-    Fitted_val(CI_ind,1)=predict(B,preds_val);
-
+    Fitted_val(CI_ind,1) = predict(B,preds_val);
 %}
+    %% ANN
+    
+    for nind = 1:10
+        net = feedforwardnet([4 3 2]);
+        trainedNet = train(net, preds_cal', CI_cal');
+        tmp_fit(nind) = trainedNet(preds_val');
+    end
+    Fitted_val(CI_ind,1) = mean(tmp_fit);
 end
 %}
 %
@@ -339,12 +347,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.mat';
+fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
