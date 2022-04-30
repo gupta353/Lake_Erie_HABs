@@ -280,7 +280,7 @@ saveas(gcf,filename,'svg');
 %
 Fitted_val = NaN*ones(length(CI),1);
 cv_mse = NaN*ones(length(CI),1);
-parfor CI_ind =  1:length(CI)
+for CI_ind =  1:length(CI)
     CI_ind
     val_ind = CI_ind;
     cal_ind = setdiff(1:length(CI),val_ind);
@@ -288,7 +288,7 @@ parfor CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -324,7 +324,7 @@ parfor CI_ind =  1:length(CI)
     cv_mse(CI_ind) = min(mse(:,4));
 %}
     %% ANN
-    %{
+    %
     for nind = 1:20
         net = feedforwardnet([4 3 2]);
         [trainedNet, tr] = train(net, preds_cal', CI_cal');
@@ -355,12 +355,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.mat';
+fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
