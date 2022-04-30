@@ -76,11 +76,14 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%{
-rng(1);
-
-for count = 1:1000
-    
+%
+R21 = NaN*ones(1000,1);
+rmse = NaN*ones(1000,1);
+lambda = NaN*ones(1000,1);
+cv_mse = NaN*ones(1000,1);
+CI_test_data = cell(1,1000);
+parfor count = 1:1000
+    rng(count)
     disp(count)
     cal_ind = randsample(length(CI),107);
     val_ind = setdiff(1:length(CI),cal_ind);
@@ -95,32 +98,19 @@ for count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-%{
+%
     % cross-validation
-    NumTrees=25:25:100;
-    NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
-    MinLeaf=2:2:6;
+    NumTrees = 100;
+    NVarToSample = 4:4:16;          % number of predictors that random forest considers at each node
+    MinLeaf = 2:2:6;
     
+    mse = NaN*ones(9,4);
     rcount = 0;
     for par1_ind = 1:length(NumTrees)
         for par2_ind = 1:length(NVarToSample)
             for par3_ind = 1:length(MinLeaf)
                 rcount = rcount+1;
                 
-                %   predfun = @(Xcal,ycal,Xval)RFreg(Xcal,ycal,Xval,NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind));
-                %   err = crossval('mse',preds_cal,CI_cal,'predfun',predfun);
-                %   err_mat(count,:) = [NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind),err];
-%                 B = TreeBagger(NumTrees(par1_ind),preds_cal,CI_cal,...
-%                     'Method','regression','NVarToSample',NVarToSample(par2_ind),'MinLeaf',MinLeaf(par3_ind));
-%                 Fitted_val=predict(B,preds_val);
-%                 scatter(CI_val,Fitted_val); hold on
-%                 ylim([0 10])
-%                 xlim([0 10])
-%                 plot([0 10],[0 10],'color','black')
-%                 R2(rcount,:)=[NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind),corr(CI_val,Fitted_val)^2];
-                %             title(['R^2 = ',num2str(R2(count,4))])
-                %             pause;
-                %             close all
                 predfun = @(Xtrain,ytrain,Xtest)RFag(Xtrain,ytrain,Xtest,NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind));
                 val = crossval('mse',preds_cal,CI_cal,'predfun',predfun);
                 mse(rcount,:) = [NumTrees(par1_ind),NVarToSample(par2_ind),MinLeaf(par3_ind),val];
@@ -132,27 +122,29 @@ for count = 1:1000
     B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
     Fitted_val=predict(B,preds_val);
-    importance(count,:) = B.OOBPermutedVarDeltaError;
+    
+    importance(count,:) = B.OOBPermutedVarDeltaError;   
+    R21(count) = corr(CI_val,Fitted_val)^2;
+    R21(count) = round(R21(count)*100)/100;
+    rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
+    cv_mse(count) = min(min(mse(:,4)));
+    CI_test_data{count} = [CI_val,Fitted_val];
+    
     scatter(CI_val,Fitted_val,'filled'); hold on
     ylim([2 8])
     xlim([2 8])
     plot([0 10],[0 10],'color','black','linewidth',2); hold off
-    
-    R21(count) = corr(CI_val,Fitted_val)^2;
-    R21(count) = round(R21(count)*100)/100;
     title(['R^2 = ',num2str(R21(count))])
-    
     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
-    box('on');
-    box.linewidth = 2;
-    set(gca,'fontname','arial','fontsize',12,box)
+%     box('on');
+%     box.linewidth = 2;
+    set(gca,'fontname','arial','fontsize',12)
     
     % save figure
     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS_corr_lag_predictors_added',fname);
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS',fname);
     print(filename,'-r300','-djpeg')
-    clear box
     
 %}
     
@@ -176,6 +168,7 @@ for count = 1:1000
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val =  [ones(size(preds_val,1),1) preds_val]*beta(:,count);
     
+    
     scatter(CI_val,Fitted_val,'filled'); hold on
     ylim([2 8])
     xlim([2 8])
@@ -184,6 +177,8 @@ for count = 1:1000
     R21(count) = corr(CI_val,Fitted_val)^2;
     rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
     lambda(count) = Fitinfo.LambdaMinMSE;
+    cv_mse(count) = min(Fitinfo.MSE);
+    CI_test_data{count} = [CI_val,Fitted_val];
     
     R21_tmp = (round(R21(count)*100))/100;
     title(['R^2 = ',num2str(R21_tmp)]);
@@ -193,11 +188,10 @@ for count = 1:1000
     box('on');
     box.linewidth = 2;
     set(gca,'fontname','arial','fontsize',12,box)
-%     pause(1);
     clear box
 
     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/lasso_regression_plots_BS',fname);
     print(filename,'-r300','-djpeg')
     close all
 %}
@@ -239,20 +233,21 @@ for count = 1:1000
 end
 %}
 end
-%{
+%
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS_corr_lag_predictors_added',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
 % hist(lambda)
 % xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
 % ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 % fname = strcat('lambda_histogram.svg');
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
 % saveas(gcf,filename,'svg');
+
 % %
 % for pind = 1:length(pred_name)
 %
@@ -261,23 +256,27 @@ saveas(gcf,filename,'svg');
 % end
 
 % beta_plot = beta(2:end,:);
-% boxplot(beta_plot',1:49);
+% boxplot(beta_plot',1:55);
 % ylabel('Regression coefficients','fontname','arial','fontsize',12)
 % set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
 % fname = 'coefficient_distribtuion.svg';
-% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/lasso_regression_plots_BS_corr_lag_predictors_added',fname);
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
 % saveas(gcf,filename,'svg');
  
-boxplot(importance,1:49);
+boxplot(importance,1:55);
 ylabel('Predictor importance','fontname','arial','fontsize',12)
 set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
 fname = 'predictor_importance.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_08_28_2021/RF_regression_plots_BS_corr_lag_predictors_added',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %}
+% save data
+fname = 'RF_BS_data.mat';
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
+save(filename)
 %}
 %% cross-validation (no validation)
-%
+%{
 Fitted_val = NaN*ones(length(CI),1);
 cv_mse = NaN*ones(length(CI),1);
 parfor CI_ind =  1:length(CI)
@@ -297,7 +296,7 @@ parfor CI_ind =  1:length(CI)
 %}
     
     %% Random Forest
-%
+%{
     NumTrees = 100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -338,7 +337,7 @@ parfor CI_ind =  1:length(CI)
     %}
 end
 %}
-%
+%{
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
 xlim([2 6.5])
