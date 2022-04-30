@@ -17,7 +17,7 @@ CI = data{2};
 preds = cat(2,data{3:end});
 preds(:,1:40) = [];
 preds(:,43:50) = []; % remove spring TP and TKN loads
-% preds(:,47:63) = []; % remove correlation-lag variables
+preds(:,47:63) = []; % remove correlation-lag variables
 % preds(:,end)=[];     % remove time-step of the 10-day time-period window
 preds(isinf(preds(:))) = 0;
 wrapper = @(x)str2num(datestr(datenum(x,'dd-mmm-yyyy'),'mm'));
@@ -279,7 +279,8 @@ saveas(gcf,filename,'svg');
 %% cross-validation (no validation)
 %
 Fitted_val = NaN*ones(length(CI),1);
-for CI_ind =  1:length(CI)
+cv_mse = NaN*ones(length(CI),1);
+parfor CI_ind =  1:length(CI)
     CI_ind
     val_ind = CI_ind;
     cal_ind = setdiff(1:length(CI),val_ind);
@@ -287,11 +288,12 @@ for CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%{
+%
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
     Fitted_val(CI_ind,1) = beta(1) + preds_val*beta(2:end);
+    cv_mse(CI_ind) = min(Fitinfo.MSE);
 %}
     
     %% Random Forest
@@ -319,15 +321,20 @@ for CI_ind =  1:length(CI)
     B = TreeBagger(mse(ind,1),preds_cal,CI_cal,...
         'Method','regression','NVarToSample',mse(ind,2),'MinLeaf',mse(ind,3),'oobvarimp','on');
     Fitted_val(CI_ind,1) = predict(B,preds_val);
+    cv_mse(CI_ind) = min(mse(:,4));
 %}
     %% ANN
-    %
+    %{
     for nind = 1:20
         net = feedforwardnet([4 3 2]);
-        trainedNet = train(net, preds_cal', CI_cal');
+        [trainedNet, tr] = train(net, preds_cal', CI_cal');
         tmp_fit(nind) = trainedNet(preds_val');
+        cv_mse_tmp(nind) = tr.best_vperf;
+        clear net
     end
     Fitted_val(CI_ind,1) = mean(tmp_fit);
+    cv_mse(CI_ind) = mean(cv_mse_tmp);
+    
     %}
 end
 %}
@@ -348,12 +355,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.svg';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed_multilagged_variables_inlcuded.mat';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
