@@ -165,7 +165,7 @@ parfor count = 1:1000
 %}
     
     %% lasso regression
-%
+%{
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta(:,count) = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -232,22 +232,28 @@ parfor count = 1:1000
 end
 %}
     %% ANN
-    %{
+    %
+    tmp_fit = NaN*ones(length(CI_val),20);
+    cv_mse_tmp = NaN*ones(1,20);
     for nind = 1:20
         net = feedforwardnet([4 3 2]);
         [trainedNet, tr] = train(net, preds_cal', CI_cal');
-        tmp_fit(nind) = trainedNet(preds_val');
+        tmp_fit(:,nind) = trainedNet(preds_val')';
         cv_mse_tmp(nind) = tr.best_vperf;
-        clear net
+        net = [];
     end
-    Fitted_val(CI_ind,1) = mean(tmp_fit,2);
-    cv_mse(CI_ind) = mean(cv_mse_tmp);
+    Fitted_val = mean(tmp_fit,2);
+    cv_mse(count) = mean(cv_mse_tmp);
     
     R21(count) = corr(CI_val,Fitted_val)^2;
     rmse(count) = (mean((CI_val-Fitted_val).^2))^0.5;
     CI_test_data{count} = [CI_val,Fitted_val];
     
     R21_tmp = (round(R21(count)*100))/100;
+    scatter(CI_val,Fitted_val,'filled'); hold on
+    ylim([2 8])
+    xlim([2 8])
+    plot([0 10],[0 10],'color','black','linewidth',2)
     title(['R^2 = ',num2str(R21_tmp)]);
     xlabel('Observed log(CI)','fontname','arial','fontsize',12)
     ylabel('Predicted log(CI)','fontname','arial','fontsize',12)
@@ -265,15 +271,15 @@ hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/ANN_regression_plots_BS',fname);
 saveas(gcf,filename,'svg');
 %
-hist(lambda)
-xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
-ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
-fname = strcat('lambda_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
-saveas(gcf,filename,'svg');
+% hist(lambda)
+% xlabel('Regularization parameter (\lambda)','fontname','arial','fontsize',12);
+% ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
+% fname = strcat('lambda_histogram.svg');
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
 
 % %
 % for pind = 1:length(pred_name)
@@ -282,13 +288,13 @@ saveas(gcf,filename,'svg');
 %     xlabel(num2str(pind),'fontname','arial','fontsize',12);
 % end
 
-beta_plot = beta(2:end,:);
-boxplot(beta_plot',1:55);
-ylabel('Regression coefficients','fontname','arial','fontsize',12)
-set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
-fname = 'coefficient_distribtuion.svg';
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
-saveas(gcf,filename,'svg');
+% beta_plot = beta(2:end,:);
+% boxplot(beta_plot',1:55);
+% ylabel('Regression coefficients','fontname','arial','fontsize',12)
+% set(gca,'fontname','arial','fontsize',10,'plotboxaspectratio',[2 1 1])
+% fname = 'coefficient_distribtuion.svg';
+% filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/LASSO_regression_plots_BS',fname);
+% saveas(gcf,filename,'svg');
  
 % boxplot(importance,1:55);
 % ylabel('Predictor importance','fontname','arial','fontsize',12)
@@ -298,7 +304,7 @@ saveas(gcf,filename,'svg');
 % saveas(gcf,filename,'svg');
 %}
 % save data
-fname = 'LASSO_BS_data.mat';
+fname = 'ANN_BS_data.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename)
 %}
