@@ -76,7 +76,7 @@ preds = preds./repmat(preds_std,size(preds,1),1);
 % preds(:,end) = [];
 
 % calibration and validation data
-%
+%{
 R21 = NaN*ones(1000,1);
 rmse = NaN*ones(1000,1);
 lambda = NaN*ones(1000,1);
@@ -232,7 +232,7 @@ parfor count = 1:1000
 end
 %}
     %% ANN
-    %
+    %{
     tmp_fit = NaN*ones(length(CI_val),20);
     cv_mse_tmp = NaN*ones(1,20);
     for nind = 1:20
@@ -266,7 +266,7 @@ end
     %}
 end
     
-%
+%{
 hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
@@ -310,7 +310,7 @@ filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04
 save(filename)
 %}
 %% cross-validation (no validation)
-%{
+%
 Fitted_val = NaN*ones(length(CI),1);
 cv_mse = NaN*ones(length(CI),1);
 parfor CI_ind =  1:length(CI)
@@ -321,7 +321,7 @@ parfor CI_ind =  1:length(CI)
     CI_val = CI(val_ind); preds_val = preds(val_ind,:);
     
     %% LASSO
-%{
+%
     [B,Fitinfo] = lasso(preds_cal,CI_cal,'alpha',0.999,'CV',5);
     ind = find(Fitinfo.MSE == min(Fitinfo.MSE));
     beta = [Fitinfo.Intercept(ind);B(:,ind)];
@@ -371,7 +371,7 @@ parfor CI_ind =  1:length(CI)
     %}
 end
 %}
-%{
+%
 scatter(CI,Fitted_val,'filled'); hold on
 ylim([2 6.5])
 xlim([2 6.5])
@@ -388,12 +388,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.svg';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed.mat';
+fname = 'LASSO_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
