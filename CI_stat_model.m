@@ -5,7 +5,7 @@ close all
 clc
 
 % read data
-fname = 'model_data_10_04_28_2022.txt';
+fname = 'model_data_20_04_28_2022.txt';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB','matlab_codes',fname);
 fid = fopen(filename,'r');
 formatspec = ['%s',repmat('%f',1,121)];
