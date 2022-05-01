@@ -330,7 +330,7 @@ parfor CI_ind =  1:length(CI)
 %}
     
     %% Random Forest
-%{
+%
     NumTrees = 100;
     NVarToSample=4:4:16;          % number of predictors that random forest considers at each node
     MinLeaf=2:2:6;
@@ -357,7 +357,7 @@ parfor CI_ind =  1:length(CI)
     cv_mse(CI_ind) = min(mse(:,4));
 %}
     %% ANN
-    %
+    %{
     tmp_fit = NaN*ones(20,1);
     cv_mse_tmp = NaN*ones(20,1);
     for nind = 1:20
@@ -390,12 +390,12 @@ title(['R^2 = ',num2str(R2)],'fontname','arial','fontsize',12);
 clear box
 
 % save plot
-fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.svg';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.svg';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 saveas(gcf,filename,'svg')
 
 % save data
-fname = 'ANN_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.mat';
+fname = 'RF_obs_pred_log_CI_cross_validation_cc10_removed_multilag_vars_included.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename);
 %}
