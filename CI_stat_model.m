@@ -101,7 +101,7 @@ parfor count = 1:1000
     % CI_cal = log(CI(cal_ind)); preds_cal = preds(cal_ind,:);
     % CI_val = log(CI(val_ind)); preds_val = preds(val_ind,:);
     %% random forest
-%{
+%
     % cross-validation
     NumTrees = 100;
     NVarToSample = 4:4:16;          % number of predictors that random forest considers at each node
@@ -146,7 +146,7 @@ parfor count = 1:1000
     
     % save figure
     fname = strcat('obs_pred_log_CI_',num2str(count),'.jpg');
-    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS',fname);
+    filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS_corr_lag_vars_added',fname);
     print(filename,'-r300','-djpeg')
     
 %}
@@ -232,7 +232,7 @@ parfor count = 1:1000
 end
 %}
     %% ANN
-    %
+    %{
     tmp_fit = NaN*ones(length(CI_val),20);
     cv_mse_tmp = NaN*ones(1,20);
     for nind = 1:20
@@ -271,7 +271,7 @@ hist(R21)
 xlabel('Coefficient of determination (R^2)','fontname','arial','fontsize',12);
 ylabel('Number of samples in the bin','fontname','arial','fontsize',12)
 fname = strcat('R2_histogram.svg');
-filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/ANN_regression_plots_BS_corr_lag_vars_added',fname);
+filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022/RF_regression_plots_BS_corr_lag_vars_added',fname);
 saveas(gcf,filename,'svg');
 %
 % hist(lambda)
@@ -305,7 +305,7 @@ saveas(gcf,filename,'svg');
 % saveas(gcf,filename,'svg');
 %}
 % save data
-fname = 'ANN_BS_data_corr_lag_vars_added.mat';
+fname = 'RF_BS_data_corr_lag_vars_added.mat';
 filename = fullfile('D:/Research/EPA_Project/Lake_Erie_HAB/matlab_codes/plots_04_28_2022',fname);
 save(filename)
 %}
